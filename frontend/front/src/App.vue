@@ -12,8 +12,40 @@
         },
         created() {
             const path = window.location.pathname;
-            const user = path.substring(1); // Remove the leading "/" from the path
+            const user = path.substring(1); 
             console.log('User:', user);
+        },
+        methods:{
+
+         send(file) {
+            fetch('http://127.0.0.1:8000/upload/', {
+              method: 'POST',
+              body: file
+            })
+              .then(response => {
+                if (response.ok) {
+                  return response.text();
+                } else {
+                  throw new Error('File upload failed');
+                }
+              })
+              .then(data => {
+                console.log('Response:', data);
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+          },
+
+          validate(){
+                var doc = document.querySelector('input[type="file"]')
+                var file = doc.files[0]
+                var extension = (doc.value.split("."))[(doc.value.split(".")).length - 1]
+                // if != docx or != doc raise some stuff
+                var f_size = file.size
+                // if size > x rasie some stuff
+                this.send(file)
+          }
         }
     }
 
@@ -30,9 +62,8 @@
         </div>
 
         <Modal v-if="showModal">
-            <!-- Add the content for your modal here -->
-            <h1>Modal Content</h1>
-            <p>This is the content of the modal.</p>
+            <input type="file" id="the_file">
+            <button @click="validate"></button>
             <button @click="showModal = false">Close</button>
         </Modal>
 
@@ -41,5 +72,3 @@
 
   
 </template>
-
-
