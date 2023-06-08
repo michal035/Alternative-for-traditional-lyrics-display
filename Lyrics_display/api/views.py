@@ -23,22 +23,19 @@ def non(request):
 
 
 
-@api_view(['POST'])
 @csrf_exempt
 def upload_file(request):
-    up_file = request.FILES['file']
-    print(up_file.name)
-    destination = open('/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/' + up_file.name, 'wb+')
-    for chunk in up_file.chunks():
-        destination.write(chunk)
-    destination.close()  
-
-    
-    #response = HttpResponse(content_type='application/octet-stream')
-    #response['Content-Disposition'] = 'attachment; filename=' + up_file.name
-    response = HttpResponse("Block")
-    
-    return HttpResponse('File upload failed.', status=200)
+    if request.method == 'POST' and 'file' in request.FILES:
+        up_file = request.FILES['file']
+        print(up_file.name)
+        destination = open('/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/' + up_file.name, 'wb+')
+        for chunk in up_file.chunks():
+            destination.write(chunk)
+        destination.close()  
+        
+        return HttpResponse('File uploaded successfully.', status=200)
+    else:
+        return HttpResponse('File upload failed.', status=400)
 
 
 

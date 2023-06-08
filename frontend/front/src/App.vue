@@ -18,22 +18,15 @@
         methods:{
 
          send(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
             fetch('http://127.0.0.1:8000/upload/', {
               method: 'POST',
-              body: file
+              body: formData,
             })
               .then(response => {
-                if (response.ok) {
-                  return response.text();
-                } else {
-                  throw new Error('File upload failed');
-                }
-              })
-              .then(data => {
-                console.log('Response:', data);
-              })
-              .catch(error => {
-                console.error('Error:', error);
+                console.log(response)
               });
           },
 
