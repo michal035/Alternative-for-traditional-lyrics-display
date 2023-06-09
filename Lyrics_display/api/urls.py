@@ -3,7 +3,7 @@ from . import views
 
 
 urlpatterns = [
-    path('upload/', views.upload_file),
+    path('upload/<token>/', views.upload_file),
     path('<token>/', views.re),
     path('', views.non),
 

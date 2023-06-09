@@ -12,16 +12,22 @@
         },
         created() {
             const path = window.location.pathname;
-            const user = path.substring(1); 
-            console.log('User:', user);
+            var token = path.substring(1); 
+            console.log('Token:', token);
         },
         methods:{
 
          send(file) {
             const formData = new FormData();
             formData.append('file', file);
+            
+            
+            const path = window.location.pathname;
+            var token = path.substring(1); 
 
-            fetch('http://127.0.0.1:8000/upload/', {
+
+            console.log('http://127.0.0.1:8000/upload/'+token)
+            fetch('http://127.0.0.1:8000/upload/'+token+'/', {
               method: 'POST',
               body: formData,
             })
@@ -31,14 +37,40 @@
           },
 
           validate(){
+                
                 var doc = document.querySelector('input[type="file"]')
                 var file = doc.files[0]
-                var extension = (doc.value.split("."))[(doc.value.split(".")).length - 1]
-                // if != docx or != doc raise some stuff
-                var f_size = file.size
-                // if size > x rasie some stuff
-                this.send(file)
+                let extension = (doc.value.split("."))[(doc.value.split(".")).length - 1]
+                
+                
+                if (extension == "doc" || extension== "docx"){
+                   let f_size = file.size
+                   f_size = (f_size/1000)/1000
+                   if (f_size > 500){
+                    console.log("file is too big!")
+                   }
+                   this.send(file)
+                }
+                else{console.log("Unaccepted file type")}
+                
+                
           }
+        },
+        mounted() {
+
+            const path = window.location.pathname;
+            var token = path.substring(1); 
+
+            fetch('http://127.0.0.1:8000/'+token)
+            .then(response => response.json())
+            .then(data => {
+                
+                console.log(data);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
         }
     }
 
