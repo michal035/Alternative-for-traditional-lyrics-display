@@ -79,6 +79,14 @@ def re(request, token):
     #to print(paragraphs)
     data = [{'paragraph': paragraph} for paragraph in paragraphs]
 
+    
+    index = 0
+    while index < len(data) - 1:
+        if data[index]['paragraph'] == '' and data[index + 1]['paragraph'] == '':
+            del data[index + 1]  
+        else:
+            index += 1  
+
 
     #serializer = ParagraphSerializer(data=data, many=True)
     #serializer.is_valid(raise_exception=True)

@@ -83,7 +83,23 @@
                 })
 
                 .then(data => {
+                    var tab = ''
                     console.log(data);
+
+                    console.log(data[2]["paragraph"])
+
+                    for(let i =0;data.length > i;i++){
+
+                        let row = data[i]["paragraph"]
+                        if(row == ""){tab += "<br>"}
+                        else{tab += "<p>"+row+"</p>"}
+
+
+                    }
+
+                    console.log(tab)
+                    var the_doc = document.getElementById("main")
+                    the_doc.innerHTML = tab
                 })
                 .catch(error => {
                     console.error(error);
@@ -111,6 +127,11 @@
         </Modal>
 
         <h1>{{text}}</h1>
+
+        <div id="main">
+
+        </div>
+
   </div>
 
   
