@@ -76,10 +76,10 @@ def re(request, token):
     
     paragraphs = [p.text for p in doc.paragraphs]
 
-    #to print(paragraphs)
     data = [{'paragraph': paragraph} for paragraph in paragraphs]
 
     
+    # I guess different 'real' paragraphs my be seperated by double blank lines or so 
     index = 0
     while index < len(data) - 1:
         if data[index]['paragraph'] == '' and data[index + 1]['paragraph'] == '':

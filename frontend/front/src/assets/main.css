@@ -21,3 +21,9 @@
 .settings-button:hover {
   background-color: #d5d5d5;
 }
+
+.a{display: flex;
+flex-direction: row;
+align-items: center;
+margin-right: 5%;
+background: transparent;}

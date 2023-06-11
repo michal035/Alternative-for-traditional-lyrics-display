@@ -111,28 +111,47 @@
 
 </script>
 
+<style>
+  .modal-content {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    align-items: center;
+    justify-items: center;
+  }
+
+  .modal-dialog {
+    margin: 0;
+    max-width: none;
+  }
+
+  .modal-body {
+    padding: 0;
+  }
+    
+</style>
+
 
 <template>
-    
     <div id="app">
-
         <div class="settings-button" @click="showModal = true">
-        <i class="fas fa-cog"></i>
+            <i class="fas fa-cog"></i>
         </div>
-
         <Modal v-if="showModal">
-            <input type="file" id="the_file">
-            <button @click="validate"></button>
-            <button @click="CloseModal">Close</button>
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="background: transparent; width: 50%">
+                <div class="modal-content" id="the" style="background: transparent;" >
+                    <div class="modal-body d-flex justify-content-center" style="width: 100%">
+                        <br>
+                        <input class="form-control outline-danger" type="file" id="the_file">
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center mt-4" style="background: transparent; width:100%">
+                        <button class="btn btn-dark btn-lg px-4 me-2" style="width: 45%;" @click="validate">Save</button>
+                        <button class="btn btn-dark btn-lg px-4 ms-2" style="width: 45%;" @click="CloseModal">Close</button>
+                    </div>
+                </div>
+            </div>
         </Modal>
-
         <h1>{{text}}</h1>
-
-        <div id="main">
-
-        </div>
-
-  </div>
-
-  
+        <div id="main"></div>
+    </div>
 </template>
