@@ -1,7 +1,6 @@
 <template>
   <div class="modal">
     <div class="modal-content">
-      <!-- Add your modal content here -->
       <slot></slot>
     </div>
   </div>
@@ -9,7 +8,6 @@
 
 <script>
 export default {
-  // Add any necessary component options here
 }
 </script>
 

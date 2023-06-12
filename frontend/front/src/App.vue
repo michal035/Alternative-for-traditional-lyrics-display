@@ -3,11 +3,11 @@
 
     export default {
         name: 'App',
-        components: {Modal},
+        components: {Modal,Modal2},
         data(){
             return{
                 text: '',
-                showModal:false
+                showModal:false,
             }
         },
         created() {
@@ -128,7 +128,9 @@
   .modal-body {
     padding: 0;
   }
-    
+
+
+
 </style>
 
 
@@ -137,12 +139,23 @@
         <div class="settings-button" @click="showModal = true">
             <i class="fas fa-cog"></i>
         </div>
+
+
         <Modal v-if="showModal">
+            
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="background: transparent; width: 50%">
                 <div class="modal-content" id="the" style="background: transparent;" >
+                    
                     <div class="modal-body d-flex justify-content-center" style="width: 100%">
                         <br>
-                        <input class="form-control outline-danger" type="file" id="the_file">
+                        <input class="form-control outline-danger" placeholder="Type in the code " type="text" id="the_file">
+                    </div>
+                    
+                    <br>
+
+                    <div class="modal-body d-flex justify-content-center" style="width: 100%">
+                        <br>
+                        <input class="form-control outline-danger" type="file"  id="the_file">
                     </div>
                     <div class="modal-footer d-flex justify-content-center mt-4" style="background: transparent; width:100%">
                         <button class="btn btn-dark btn-lg px-4 me-2" style="width: 45%;" @click="validate">Save</button>
@@ -150,6 +163,7 @@
                     </div>
                 </div>
             </div>
+
         </Modal>
         <h1>{{text}}</h1>
         <div>
