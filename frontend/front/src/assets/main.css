@@ -23,7 +23,5 @@
 }
 
 .a{display: flex;
-flex-direction: row;
-align-items: center;
-margin-right: 5%;
-background: transparent;}
+flex-direction: column;
+align-items: center;}

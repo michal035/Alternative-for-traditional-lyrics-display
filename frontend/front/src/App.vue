@@ -83,7 +83,7 @@
                 })
 
                 .then(data => {
-                    var tab = ''
+                    var tab = '<br>'
                     console.log(data);
 
                     console.log(data[2]["paragraph"])
@@ -92,7 +92,7 @@
 
                         let row = data[i]["paragraph"]
                         if(row == ""){tab += "<br>"}
-                        else{tab += "<p>"+row+"</p>"}
+                        else{tab += "<p style='text-align: center'>"+row+"</p>"}
 
 
                     }
@@ -152,6 +152,8 @@
             </div>
         </Modal>
         <h1>{{text}}</h1>
-        <div id="main"></div>
+        <div>
+            <div class="a" id="main"></div>
+        </div>
     </div>
 </template>
