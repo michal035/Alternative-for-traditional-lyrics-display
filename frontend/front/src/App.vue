@@ -3,11 +3,13 @@
 
     export default {
         name: 'App',
-        components: {Modal,Modal2},
+        components: {Modal},
+
         data(){
             return{
                 text: '',
                 showModal:false,
+                downloadLink: '',
             }
         },
         created() {
@@ -109,6 +111,11 @@
     }
 
 
+
+    var qrCodeElement = document.getElementById("qrcode");
+
+    
+
 </script>
 
 <style>
@@ -157,14 +164,25 @@
                         <br>
                         <input class="form-control outline-danger" type="file"  id="the_file">
                     </div>
-                    <div class="modal-footer d-flex justify-content-center mt-4" style="background: transparent; width:100%">
-                        <button class="btn btn-dark btn-lg px-4 me-2" style="width: 45%;" @click="validate">Save</button>
-                        <button class="btn btn-dark btn-lg px-4 ms-2" style="width: 45%;" @click="CloseModal">Close</button>
+                    <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="validate">Save</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal">Close</button>
+                    </div>
+
+                    <br>
+                    <br>
+                    <div>
+                    <div id="qrcode"></div>
+                        <a :href="downloadLink" download="qrcode.png">Download QR Code</a>
                     </div>
                 </div>
+                    
             </div>
 
+
+
         </Modal>
+
         <h1>{{text}}</h1>
         <div>
             <div class="a" id="main"></div>

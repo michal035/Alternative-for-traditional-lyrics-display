@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.http import FileResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.http import FileResponse
 import docx
 import json 
 
@@ -62,6 +63,20 @@ def upload_file(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 """       
+
+
+
+@api_view(['GET'])
+def re_qr(request, token):
+
+    image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token}.jpg"
+    image_file = open(image_path, 'rb')
+
+    response = FileResponse(image_file, content_type='image/jpeg')
+    
+    return response
+
+
 
 
 @api_view(['GET'])
