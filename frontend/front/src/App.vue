@@ -1,14 +1,17 @@
 <script>
     import Modal from './Modal.vue';
+    import Modal2 from './Create_new_modal.vue'
+
 
     export default {
         name: 'App',
-        components: {Modal},
+        components: {Modal, Modal2},
 
         data(){
             return{
                 text: '',
                 showModal:false,
+                showModalv2: false,
                 downloadLink: '',
             }
         },
@@ -59,6 +62,10 @@
           CloseModal(){
             this.showModal = false
             location.reload()
+          },
+          NewDocument(){
+            console.log("new doc")
+            this.showModalv2 = true
           }
         },
 
@@ -75,6 +82,7 @@
                     if (response.status == 200) {
                         return response.json();
                     } else if (response.status === 404) {
+                       this.NewDocument()
                         throw new Error('Resource not found');
                     } else if (response.status === 204) {
                         //Custom message will need to appear 
@@ -111,15 +119,17 @@
     }
 
 
-
     var qrCodeElement = document.getElementById("qrcode");
 
-    
 
 </script>
 
+
+
 <style>
-  .modal-content {
+
+
+  .modal-content{
     background: transparent;
     border: none;
     box-shadow: none;
@@ -127,16 +137,14 @@
     justify-items: center;
   }
 
-  .modal-dialog {
+  .modal-dialog  {
     margin: 0;
     max-width: none;
   }
 
-  .modal-body {
+  .modal-body{
     padding: 0;
   }
-
-
 
 </style>
 
@@ -146,6 +154,27 @@
         <div class="settings-button" @click="showModal = true">
             <i class="fas fa-cog"></i>
         </div>
+
+
+        <Modal2 v-if="showModalv2">
+            <div class="Modal2">
+                <div class="Modal2-content">
+                <div class="modal2-body">
+                    <img src="your-image-path" alt="Modal Image" class="modal2-image" />
+
+                    <br>
+
+                    <input type="text" class="modal2-input" placeholder="Input 1" />
+                    <input type="text" class="modal2-input" placeholder="Input 2" />
+
+                    <div class="modal2-buttons">
+                        <button class="modal2-button">Button 1</button>
+                        <button class="moda2l-button">Button 2</button>
+                    </div>
+                </div>
+                </div>
+            </div>     
+        </Modal2>
 
 
         <Modal v-if="showModal">

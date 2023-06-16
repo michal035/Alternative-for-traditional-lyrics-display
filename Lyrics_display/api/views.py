@@ -93,7 +93,7 @@ def re(request, token):
 
     data = [{'paragraph': paragraph} for paragraph in paragraphs]
 
-    
+   
     # I guess different 'real' paragraphs my be seperated by double blank lines or so 
     index = 0
     while index < len(data) - 1:
