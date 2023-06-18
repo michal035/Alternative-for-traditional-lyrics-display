@@ -12,7 +12,7 @@ import docx
 import json 
 
 
-
+#All of the paths need to be changed to relative paths
 
 def non(request):
     return HttpResponseNotFound("Token not found")

@@ -1,11 +1,11 @@
 <script>
     import Modal from './Modal.vue';
-    import Modal2 from './Create_new_modal.vue'
+    //import Modal2 from './Create_new_modal.vue'
 
 
     export default {
         name: 'App',
-        components: {Modal, Modal2},
+        components: {Modal},
 
         data(){
             return{
@@ -63,10 +63,39 @@
             this.showModal = false
             location.reload()
           },
+          CloseModalv2(){
+            this.showModalv2 = false
+            // I guess the doc not found should be called or if it got reated it should be redirected to the right page
+            location.reload()
+          },
           NewDocument(){
             console.log("new doc")
             this.showModalv2 = true
-          }
+          },
+          ShowInfo(){
+            var code = document.getElementById("the_code").value;
+
+            document.getElementById("create_new").innerHTML = ""
+
+
+             if (!code) {
+                console.error('No input provided');
+                return;
+            }
+
+                const encoder = new TextEncoder();
+                const data = encoder.encode(code);
+
+                crypto.subtle.digest('SHA-256', data)
+                    .then(hashBuffer => {
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+                    console.log('SHA-256 Hash:', hashHex);
+                    })
+                    .catch(error => {
+                    console.error('Error calculating hash:', error);
+                    });
+            }
         },
 
 
@@ -156,25 +185,29 @@
         </div>
 
 
-        <Modal2 v-if="showModalv2">
-            <div class="Modal2">
-                <div class="Modal2-content">
-                <div class="modal2-body">
-                    <img src="your-image-path" alt="Modal Image" class="modal2-image" />
+        <Modal v-if="showModalv2">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" id="create_new" style="background: transparent; width: 50%">
+                <div class="modal-content" id="the" style="background: transparent;" >
+                    
+                    <div class="modal-body d-flex justify-content-center" style="width: 100%">
+                        <br>
+                        <input class="form-control outline-danger" placeholder="Type in the code " type="text" id="the_code">
+                    </div>
+                                   
+                    <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="ShowInfo">Create</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModalv2">Close</button>
+                    </div>
 
                     <br>
-
-                    <input type="text" class="modal2-input" placeholder="Input 1" />
-                    <input type="text" class="modal2-input" placeholder="Input 2" />
-
-                    <div class="modal2-buttons">
-                        <button class="modal2-button">Button 1</button>
-                        <button class="moda2l-button">Button 2</button>
+                    <br>
+                    <div>
+                        
                     </div>
                 </div>
-                </div>
+                    
             </div>     
-        </Modal2>
+        </Modal>
 
 
         <Modal v-if="showModal">

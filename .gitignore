@@ -2,3 +2,14 @@ lyrics/
 Lyrics_display/Lyrics_display/
 files/
 config.ini
+User/
+Cookies
+Preferences
+Network Persistent State
+machineid
+languagepacks.json
+Cookies-journal
+TransportSecurity
+logs/
+CachedData/
+CachedProfilesData/
