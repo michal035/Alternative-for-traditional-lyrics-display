@@ -8,14 +8,19 @@ from rest_framework.decorators import api_view
 from django.http import FileResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse
+from . import generate_qr_code
+import string
+import random
 import docx
 import json 
 
 
 #All of the paths need to be changed to relative paths
+# Some double checks are unnecessary and in some cases I need to add more - I need to log them as well
 
 def non(request):
     return HttpResponseNotFound("Token not found")
+
 
 
 @api_view(['POST'])
@@ -46,26 +51,6 @@ def upload_file(request,token):
 
 
 
-
-"""
-@api_view(['POST'])
-@csrf_exempt
-def upload_file(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            print(data)
-            
-
-            return JsonResponse({'message': 'File upload successful'})
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-"""       
-
-
-
 @api_view(['GET'])
 def re_qr(request, token):
 
@@ -74,8 +59,37 @@ def re_qr(request, token):
 
     response = FileResponse(image_file, content_type='image/jpeg')
     
+    response.status_code = 200
+
     return response
 
+
+
+@api_view(['POST'])
+@csrf_exempt
+def Create_new_doc(request):
+   
+    code = json.loads(request.body)
+    code = code['code']
+    print(code)
+    # Generating a token with a fixed number of characters - 20 should work just fine  
+    characters = string.ascii_letters + string.digits
+    token = ''.join(random.choice(characters) for _ in range(20))
+    
+    #There needs to be check done in DB, if this token already exists 
+    # code + token added to DB
+
+    generate_qr_code(token)
+
+    image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token}.jpg"
+    image_file = open(image_path, 'rb')
+
+    response = FileResponse(image_file, content_type='image/jpeg')
+
+    response['token'] = token
+    response.status_code = 200
+
+    return response
 
 
 

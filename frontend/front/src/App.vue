@@ -88,13 +88,35 @@
 
                 crypto.subtle.digest('SHA-256', data)
                     .then(hashBuffer => {
-                    const hashArray = Array.from(new Uint8Array(hashBuffer));
-                    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+                    var hashArray = Array.from(new Uint8Array(hashBuffer));
+                    var hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+                    
                     console.log('SHA-256 Hash:', hashHex);
+
+
+                    var data = {code: hashHex}
+
+                    const requestOptions = {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    };
+
+
+                    fetch('http://127.0.0.1:8000/create-new/', requestOptions)
+                   .then(response => response.json())
+                    .then(jsonData => {
+                        const code = jsonData.code; 
+                        console.log(code); 
+                    })
                     })
                     .catch(error => {
                     console.error('Error calculating hash:', error);
                     });
+
+               
             }
         },
 
