@@ -1,7 +1,7 @@
 import qrcode
 
 #Yeah, I know - I need to put relative paths evrywhere 
-def generate_qr_code(token):
+def generate_qr(token):
     
     qr = qrcode.QRCode(version=1, box_size=10, border=4)
     qr.add_data(token)

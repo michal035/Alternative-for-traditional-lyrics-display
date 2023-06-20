@@ -105,15 +105,31 @@
                     };
 
 
-                    fetch('http://127.0.0.1:8000/create-new/', requestOptions)
-                   .then(response => response.json())
-                    .then(jsonData => {
-                        const code = jsonData.code; 
-                        console.log(code); 
-                    })
+                    fetch('http://127.0.0.1:8000/create-new', requestOptions)
+                   .then((response) => {
+                    if (response.ok) {
+
+                     const token = response.headers.get('token');
+                    console.log('Token:', token);
+
+                    return response.blob().then((blob) => {
+
+                        const imageUrl = URL.createObjectURL(blob);
+                        return { token, imageUrl };
+                    });
+                    } else {
+                    throw new Error("Request failed " + response.status);
+                    }
+                })
+                .then((data) => {
+                    console.log("Token:", token);
+                    console.log("Image URL:", imageUrl);
+
+                    //window.location.href = "http://localhost:5173/"+token      
+                })
                     })
                     .catch(error => {
-                    console.error('Error calculating hash:', error);
+                    console.error('Error', error);
                     });
 
                
@@ -209,7 +225,7 @@
 
         <Modal v-if="showModalv2">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" id="create_new" style="background: transparent; width: 50%">
-                <div class="modal-content" id="the" style="background: transparent;" >
+                <div class="modal-content" style="background: transparent;" >
                     
                     <div class="modal-body d-flex justify-content-center" style="width: 100%">
                         <br>
@@ -239,7 +255,7 @@
                     
                     <div class="modal-body d-flex justify-content-center" style="width: 100%">
                         <br>
-                        <input class="form-control outline-danger" placeholder="Type in the code " type="text" id="the_file">
+                        <input class="form-control outline-danger" placeholder="Type in the code " type="text" id="the_code_r">
                     </div>
                     
                     <br>

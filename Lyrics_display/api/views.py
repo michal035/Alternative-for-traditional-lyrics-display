@@ -79,7 +79,7 @@ def Create_new_doc(request):
     #There needs to be check done in DB, if this token already exists 
     # code + token added to DB
 
-    generate_qr_code(token)
+    generate_qr_code.generate_qr(token)
 
     image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token}.jpg"
     image_file = open(image_path, 'rb')
@@ -90,6 +90,8 @@ def Create_new_doc(request):
     response.status_code = 200
 
     return response
+
+
 
 
 
