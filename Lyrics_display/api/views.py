@@ -13,10 +13,12 @@ import string
 import random
 import docx
 import json 
+import base64
 
 
 #All of the paths need to be changed to relative paths
 # Some double checks are unnecessary and in some cases I need to add more - I need to log them as well
+
 
 def non(request):
     return HttpResponseNotFound("Token not found")
@@ -57,9 +59,7 @@ def re_qr(request, token):
     image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token}.jpg"
     image_file = open(image_path, 'rb')
 
-    response = FileResponse(image_file, content_type='image/jpeg')
-    
-    response.status_code = 200
+    response = FileResponse(image_file, content_type='image/jpeg', status=200)
 
     return response
 
@@ -84,14 +84,9 @@ def Create_new_doc(request):
     image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token}.jpg"
     image_file = open(image_path, 'rb')
 
-    response = FileResponse(image_file, content_type='image/jpeg')
-
-    response['token'] = token
-    response.status_code = 200
+    response = JsonResponse(data={"token": token}, status=200)
 
     return response
-
-
 
 
 

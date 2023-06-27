@@ -1,6 +1,5 @@
 <script>
-    import Modal from './Modal.vue';
-    //import Modal2 from './Create_new_modal.vue'
+    import Modal from './Modal.vue'
 
 
     export default {
@@ -15,20 +14,22 @@
                 downloadLink: '',
             }
         },
+
         created() {
-            const path = window.location.pathname;
-            var token = path.substring(1); 
-            console.log('Token:', token);
+            const path = window.location.pathname
+            var token = path.substring(1)
+            console.log('Token:', token)
         },
+
         methods:{
 
          send(file) {
-            const formData = new FormData();
-            formData.append('file', file);
+            const formData = new FormData()
+            formData.append('file', file)
             
             
-            const path = window.location.pathname;
-            var token = path.substring(1); 
+            const path = window.location.pathname
+            var token = path.substring(1)
 
 
             console.log('http://127.0.0.1:8000/upload/'+token)
@@ -38,7 +39,7 @@
             })
               .then(response => {
                 console.log(response)
-              });
+              })
           },
 
           validate(){
@@ -59,39 +60,62 @@
                 else{console.log("Unaccepted file type")}
                 
           },
+
           CloseModal(){
             this.showModal = false
             location.reload()
           },
+
           CloseModalv2(){
             this.showModalv2 = false
             // I guess the doc not found should be called or if it got reated it should be redirected to the right page
             location.reload()
           },
+
+          //stil work in progress - need to handel qr code - create a blob and then place the img in rght place
+          GetQR(token_){
+            var data = {token: token_}
+
+            const requestOptions = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }
+
+                    fetch('http://127.0.0.1:8000/create-new', requestOptions)
+                   .then((response) => {
+                      //handle .png qr code
+                    })
+                    
+                    
+          },
+
           NewDocument(){
             console.log("new doc")
             this.showModalv2 = true
           },
+
           ShowInfo(){
-            var code = document.getElementById("the_code").value;
+            var code = document.getElementById("the_code").value
 
             document.getElementById("create_new").innerHTML = ""
 
-
              if (!code) {
-                console.error('No input provided');
-                return;
+                console.error('No input provided')
+                return
             }
 
-                const encoder = new TextEncoder();
-                const data = encoder.encode(code);
+                const encoder = new TextEncoder()
+                const data = encoder.encode(code)
 
                 crypto.subtle.digest('SHA-256', data)
                     .then(hashBuffer => {
-                    var hashArray = Array.from(new Uint8Array(hashBuffer));
-                    var hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+                    var hashArray = Array.from(new Uint8Array(hashBuffer))
+                    var hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('')
                     
-                    console.log('SHA-256 Hash:', hashHex);
+                    console.log('SHA-256 Hash:', hashHex)
 
 
                     var data = {code: hashHex}
@@ -102,40 +126,33 @@
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify(data)
-                    };
-
+                    }
 
                     fetch('http://127.0.0.1:8000/create-new', requestOptions)
                    .then((response) => {
-                    if (response.ok) {
+                      return response.json()
+                    }).then((data)=>{
 
-                     const token = response.headers.get('token');
-                    console.log('Token:', token);
-
-                    return response.blob().then((blob) => {
-
-                        const imageUrl = URL.createObjectURL(blob);
-                        return { token, imageUrl };
-                    });
-                    } else {
-                    throw new Error("Request failed " + response.status);
-                    }
-                })
-                .then((data) => {
-                    console.log("Token:", token);
-                    console.log("Image URL:", imageUrl);
-
-                    //window.location.href = "http://localhost:5173/"+token      
-                })
+                    
+                        console.log(data.token)
+                        var modal_div = document.getElementById("create_new")
+                        modal_div.innerHTML = `
+                        
+                        <div class="modal-body d-flex justify-content-center" style="width: 100%">
+                            <br>
+                            <p>`+data.token+`</p>
+                        </div>
+                        
+                        `
+                        //place to call a function to get QRcode
+                        
+                        })
                     })
                     .catch(error => {
                     console.error('Error', error);
                     });
-
-               
             }
         },
-
 
         mounted() {
 
@@ -185,8 +202,6 @@
         }
     }
 
-
-    var qrCodeElement = document.getElementById("qrcode");
 
 
 </script>
