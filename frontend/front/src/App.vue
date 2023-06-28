@@ -84,11 +84,22 @@
                 body: JSON.stringify(data)
             }
 
-                    fetch('http://127.0.0.1:8000/create-new', requestOptions)
-                   .then((response) => {
-                      //handle .png qr code
-                    })
-                    
+                    fetch("http://127.0.0.1:8000/" + token_ + "/qr")
+                        .then((response) => response.blob()) // Retrieve response as a Blob object
+                        .then((blob) => {
+                            var imgUrl = URL.createObjectURL(blob); // Create a URL for the Blob object
+
+                            var modal_div = document.getElementById("create_new");
+                            modal_div.innerHTML = `
+                            <div class="modal-body d-flex justify-content-center flex-direction: column" style="width: 100%">
+                                <br>
+                                <p>`+ data.token + `</p>
+                                <br>
+                                <img src="` + imgUrl + ` ">
+                            </div>`;
+                        })
+                        .catch((err) => console.log(err));
+          
                     
           },
 
@@ -144,13 +155,13 @@
                         </div>
                         
                         `
-                        //place to call a function to get QRcode
+                        this.GetQR(data.token)
                         
                         })
                     })
                     .catch(error => {
                     console.error('Error', error);
-                    });
+                    });  
             }
         },
 
