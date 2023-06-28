@@ -11,7 +11,9 @@
                 text: '',
                 showModal:false,
                 showModalv2: false,
-                downloadLink: '',
+                showModalv3: false,
+                imgUrl: '',
+                token: ''
             }
         },
 
@@ -71,8 +73,11 @@
             // I guess the doc not found should be called or if it got reated it should be redirected to the right page
             location.reload()
           },
+          CloseModalv3(){
+            this.showModal = false
+            location.reload()
+          },
 
-          //stil work in progress - need to handel qr code - create a blob and then place the img in rght place
           GetQR(token_){
             var data = {token: token_}
 
@@ -85,22 +90,20 @@
             }
 
                     fetch("http://127.0.0.1:8000/" + token_ + "/qr")
-                        .then((response) => response.blob()) // Retrieve response as a Blob object
+                        .then((response) => response.blob()) 
                         .then((blob) => {
-                            var imgUrl = URL.createObjectURL(blob); // Create a URL for the Blob object
+                            var imgUrl = URL.createObjectURL(blob); 
 
                             var modal_div = document.getElementById("create_new");
-                            modal_div.innerHTML = `
-                            <div class="modal-body d-flex justify-content-center flex-direction: column" style="width: 100%">
-                                <br>
-                                <p>`+ data.token + `</p>
-                                <br>
-                                <img src="` + imgUrl + ` ">
-                            </div>`;
+                            
+                            this.token = data.token
+                            this.imgUrl = imgUrl
+                            
+                            this.showModalv3 = true
+                            
                         })
                         .catch((err) => console.log(err));
-          
-                    
+        
           },
 
           NewDocument(){
@@ -153,7 +156,6 @@
                             <br>
                             <p>`+data.token+`</p>
                         </div>
-                        
                         `
                         this.GetQR(data.token)
                         
@@ -271,6 +273,30 @@
                 </div>
                     
             </div>     
+        </Modal>
+
+
+        <Modal v-if="showModalv3">
+            
+                
+                <div class="modal-body d-flex flex-column align-items-center background: transparent; width: 50%" style="width: 100%">
+                            <br>
+                            <p style="text-align: center;">{{ this.token }}</p>
+                            <br>
+                            <img :src=this.imgUrl onclick="downloadFile('${imgUrl}')">
+                            <br>
+                            <div style="text-align: center;">
+                                <a :href=this.imgUrl download style="text-decoration: none; margin:20px;">
+                                    <i class="fas fa-download" style="font-size: 40px; color: black; "></i> 
+                                </a>
+
+                                <a href="#" :onclick=this.imgUrl style="text-decoration: none; margin:20px;">
+                                    <i class="fas fa-share-alt" style="font-size: 40px; color: black; "></i> 
+                                </a>
+                            </div>
+
+                </div>
+                       
         </Modal>
 
 
