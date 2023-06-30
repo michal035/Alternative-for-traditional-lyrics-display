@@ -10,8 +10,11 @@
             return{
                 text: '',
                 showModal:false,
-                showModalv2: false,
+                showModal_main: false,
                 showModalv3: false,
+                showmodal_first_page: false,
+                showmodal_join_via_code: false,
+                showmodal_create_new: false,
                 imgUrl: '',
                 token: ''
             }
@@ -68,8 +71,8 @@
             location.reload()
           },
 
-          CloseModalv2(){
-            this.showModalv2 = false
+          CloseModal_main(){
+            this.showModal_main = false
             // I guess the doc not found should be called or if it got reated it should be redirected to the right page
             location.reload()
           },
@@ -108,7 +111,7 @@
 
           NewDocument(){
             console.log("new doc")
-            this.showModalv2 = true
+            this.showModal_main = true
           },
 
           ShowInfo(){
@@ -164,6 +167,15 @@
                     .catch(error => {
                     console.error('Error', error);
                     });  
+            },
+            Create_new(){
+                this.showModal_main = false;
+                this.showmodal_create_new = true;
+            },
+            Join_via_code(){
+                this.showModal_main = false;
+                this.Join_via_code = true;
+
             }
         },
 
@@ -250,19 +262,15 @@
             <i class="fas fa-cog"></i>
         </div>
 
-
-        <Modal v-if="showModalv2">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" id="create_new" style="background: transparent; width: 50%">
-                <div class="modal-content" style="background: transparent;" >
+        <!--First modal the user would see -->
+        <Modal v-if="showModal_main">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" id="main_page" style="background: transparent; width: 50%">
+                <div class="modal-content" style="background: transparent;" id="the_content_part" >
                     
-                    <div class="modal-body d-flex justify-content-center" style="width: 100%">
-                        <br>
-                        <input class="form-control outline-danger" placeholder="Type in the code " type="text" id="the_code">
-                    </div>
-                                   
+
                     <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="ShowInfo">Create</button>
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModalv2">Close</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="Create_new">Create new</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="Join_via_code">Join via code</button>
                     </div>
 
                     <br>
@@ -281,17 +289,24 @@
                 
                 <div class="modal-body d-flex flex-column align-items-center background: transparent; width: 50%" style="width: 100%">
                             <br>
-                            <p style="text-align: center;">{{ this.token }}</p>
+                            
+                            <p style="text-align: center; color: white;">Here is the code: <h3>{{ this.token }}</h3></p>
+                           
                             <br>
                             <img :src=this.imgUrl onclick="downloadFile('${imgUrl}')">
                             <br>
                             <div style="text-align: center;">
                                 <a :href=this.imgUrl download style="text-decoration: none; margin:20px;">
-                                    <i class="fas fa-download" style="font-size: 40px; color: black; "></i> 
+                                    <i class="fas fa-download" style="font-size: 40px; color: white; "></i> 
                                 </a>
 
                                 <a href="#" :onclick=this.imgUrl style="text-decoration: none; margin:20px;">
-                                    <i class="fas fa-share-alt" style="font-size: 40px; color: black; "></i> 
+                                    <i class="fas fa-lock" style="font-size: 40px; color: white; "></i> 
+                                </a>
+
+
+                                  <a href="" style="text-decoration: none; margin:20px;">
+                                    <i class="fas fa-window-close" style="font-size: 40px; color: white; "></i>
                                 </a>
                             </div>
 
@@ -333,6 +348,36 @@
 
 
 
+        </Modal>
+
+ 
+        <!-- Create new modal -->
+        <Modal v-if="showmodal_create_new">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"  style="background: transparent; width: 50%">
+                <div class="modal-content" style="background: transparent;" >
+
+                    <div class="modal-body d-flex justify-content-center" style="width: 100%">
+                        <br>
+                        <input class="form-control outline-danger" placeholder="Type in the code " type="text" id="the_code">
+                    </div>
+                                   
+                    <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="Create_new">Create</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal">Close</button>
+                    </div>                
+                </div>
+            </div>     
+        </Modal>
+
+
+        <!-- Join via code modal -->
+        <Modal v-if="showmodal_join_via_code">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="background: transparent; width: 50%">
+                <div class="modal-content" style="background: transparent;"  >
+                    
+                    <p>Join via code</p>
+                </div>
+            </div>     
         </Modal>
 
         <h1>{{text}}</h1>
