@@ -11,12 +11,13 @@
                 text: '',
                 showModal:false,
                 showModal_main: false,
-                showModalv3: false,
+                showModal_final: false,
                 showmodal_first_page: false,
                 showmodal_join_via_code: false,
                 showmodal_create_new: false,
                 imgUrl: '',
-                token: ''
+                token: '',
+                doc_url: ''
             }
         },
 
@@ -66,6 +67,16 @@
                 
           },
 
+          RedirectToPage(){
+            this.doc_url = '/'+this.token
+            window.location.href = '/'+ this.token
+          },
+
+          RedirectToPage_from_join_modal(){
+            this.doc_url = '/'+ document.getElementById("join_token").value
+            window.location.href = this.doc_url
+          },
+
           CloseModal(){
             this.showModal = false
             location.reload()
@@ -97,12 +108,13 @@
                         .then((blob) => {
                             var imgUrl = URL.createObjectURL(blob); 
 
-                            var modal_div = document.getElementById("create_new");
+                            //var modal_div = document.getElementById("create_new");
                             
                             this.token = data.token
                             this.imgUrl = imgUrl
                             
-                            this.showModalv3 = true
+                            this.showmodal_create_new = false
+                            this.showModal_final = true
                             
                         })
                         .catch((err) => console.log(err));
@@ -117,7 +129,7 @@
           ShowInfo(){
             var code = document.getElementById("the_code").value
 
-            document.getElementById("create_new").innerHTML = ""
+            //document.getElementById("create_new").innerHTML = ""
 
              if (!code) {
                 console.error('No input provided')
@@ -153,13 +165,16 @@
                     
                         console.log(data.token)
                         var modal_div = document.getElementById("create_new")
-                        modal_div.innerHTML = `
+
+                       /*
+                       modal_div.innerHTML = `
                         
                         <div class="modal-body d-flex justify-content-center" style="width: 100%">
                             <br>
                             <p>`+data.token+`</p>
                         </div>
-                        `
+
+                        `*/
                         this.GetQR(data.token)
                         
                         })
@@ -174,7 +189,7 @@
             },
             Join_via_code(){
                 this.showModal_main = false;
-                this.Join_via_code = true;
+                this.showmodal_join_via_code = true;
 
             }
         },
@@ -268,15 +283,9 @@
                 <div class="modal-content" style="background: transparent;" id="the_content_part" >
                     
 
-                    <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="Create_new">Create new</button>
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="Join_via_code">Join via code</button>
-                    </div>
-
-                    <br>
-                    <br>
-                    <div>
-                        
+                    <div class=" d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%; margin: 20px;" @click="Create_new">Create new</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%; margin: 20px;" @click="Join_via_code">Join via code</button>
                     </div>
                 </div>
                     
@@ -284,7 +293,7 @@
         </Modal>
 
 
-        <Modal v-if="showModalv3">
+        <Modal v-if="showModal_final">
             
                 
                 <div class="modal-body d-flex flex-column align-items-center background: transparent; width: 50%" style="width: 100%">
@@ -305,7 +314,7 @@
                                 </a>
 
 
-                                  <a href="" style="text-decoration: none; margin:20px;">
+                                  <a :href=this.doc_url @click="RedirectToPage" style="text-decoration: none; margin:20px;">
                                     <i class="fas fa-window-close" style="font-size: 40px; color: white; "></i>
                                 </a>
                             </div>
@@ -358,11 +367,11 @@
 
                     <div class="modal-body d-flex justify-content-center" style="width: 100%">
                         <br>
-                        <input class="form-control outline-danger" placeholder="Type in the code " type="text" id="the_code">
+                        <input class="form-control outline-danger" placeholder="Type in the code - this will alow you to make changes, treat this like a password" type="text" id="the_code">
                     </div>
                                    
                     <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="Create_new">Create</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="ShowInfo">Create</button>
                         <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal">Close</button>
                     </div>                
                 </div>
@@ -375,10 +384,19 @@
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="background: transparent; width: 50%">
                 <div class="modal-content" style="background: transparent;"  >
                     
-                    <p>Join via code</p>
+                            <div class="modal-body d-flex justify-content-center" style="width: 100%">
+                                <br>
+                                <input class="form-control outline-danger" placeholder="Type in the token" type="text" id="join_token">
+                            </div>
+                                        
+                            <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
+                                <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="RedirectToPage_from_join_modal">Join</button>
+                                <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal">Close</button>
+                            </div>                
+                      
                 </div>
             </div>     
-        </Modal>
+        </Modal> 
 
         <h1>{{text}}</h1>
         <div>
