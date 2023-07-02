@@ -190,8 +190,45 @@
             Join_via_code(){
                 this.showModal_main = false;
                 this.showmodal_join_via_code = true;
+            },
+            notFound(){
+                var the_doc = document.getElementById("main")
+                the_doc.innerHTML = `<br> <h3>Documnet not found </h3>`
+            },
 
+            GetQR_settings(token_){
+            var data = {token: token_}
+
+            const requestOptions = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
             }
+
+                    fetch("http://127.0.0.1:8000/" + token_ + "/qr")
+                        .then((response) => response.blob()) 
+                        .then((blob) => {
+                            var imgUrl = URL.createObjectURL(blob); 
+
+                            
+                            this.token = data.token
+                            this.imgUrl = imgUrl
+                            
+                        })
+                        .catch((err) => console.log(err));
+          },
+
+            ShowSettings(){
+                this.showModal = true
+
+                const path = window.location.pathname
+                var token = path.substring(1)
+
+                this.GetQR_settings(token)
+            },
+
         },
 
         mounted() {
@@ -206,10 +243,10 @@
                     if (response.status == 200) {
                         return response.json();
                     } else if (response.status === 404) {
-                       this.NewDocument()
+                        this.NewDocument()
                         throw new Error('Resource not found');
                     } else if (response.status === 204) {
-                        //Custom message will need to appear 
+                        this.notFound()
                         throw new Error('There is no such .docx');
                     } else {
                         throw new Error('Something went wrong');
@@ -273,7 +310,7 @@
 
 <template>
     <div id="app">
-        <div class="settings-button" @click="showModal = true">
+        <div class="settings-button" @click="ShowSettings">
             <i class="fas fa-cog"></i>
         </div>
 
@@ -344,13 +381,13 @@
                         <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="validate">Save</button>
                         <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal">Close</button>
                     </div>
-
                     <br>
                     <br>
                     <div>
                     <div id="qrcode"></div>
-                        <a :href="downloadLink" download="qrcode.png">Download QR Code</a>
+                        <img :src=this.imgUrl onclick="downloadFile('${imgUrl}')">
                     </div>
+                    
                 </div>
                     
             </div>
@@ -384,15 +421,15 @@
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="background: transparent; width: 50%">
                 <div class="modal-content" style="background: transparent;"  >
                     
-                            <div class="modal-body d-flex justify-content-center" style="width: 100%">
-                                <br>
-                                <input class="form-control outline-danger" placeholder="Type in the token" type="text" id="join_token">
-                            </div>
-                                        
-                            <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
-                                <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="RedirectToPage_from_join_modal">Join</button>
-                                <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal">Close</button>
-                            </div>                
+                    <div class="modal-body d-flex justify-content-center" style="width: 100%">
+                        <br>
+                        <input class="form-control outline-danger" placeholder="Type in the token" type="text" id="join_token">
+                    </div>
+                                
+                    <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="RedirectToPage_from_join_modal">Join</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal">Close</button>
+                    </div>                
                       
                 </div>
             </div>     
