@@ -67,11 +67,6 @@
                 
           },
 
-          RedirectToPage(){
-            this.doc_url = '/'+this.token
-            window.location.href = '/'+ this.token
-          },
-
           RedirectToPage_from_join_modal(){
             this.doc_url = '/'+ document.getElementById("join_token").value
             window.location.href = this.doc_url
@@ -127,8 +122,9 @@
           },
 
           ShowInfo(){
-            var code = document.getElementById("the_code").value
-
+            //var code = document.getElementById("the_code").value
+            this.showModal_main = false
+            var code ="tempCode"
             //document.getElementById("create_new").innerHTML = ""
 
              if (!code) {
@@ -166,15 +162,6 @@
                         console.log(data.token)
                         var modal_div = document.getElementById("create_new")
 
-                       /*
-                       modal_div.innerHTML = `
-                        
-                        <div class="modal-body d-flex justify-content-center" style="width: 100%">
-                            <br>
-                            <p>`+data.token+`</p>
-                        </div>
-
-                        `*/
                         this.GetQR(data.token)
                         
                         })
@@ -193,7 +180,7 @@
             },
             notFound(){
                 var the_doc = document.getElementById("main")
-                the_doc.innerHTML = `<br> <h3>Documnet not found </h3>`
+                the_doc.innerHTML = `<br> <h3>No document associated with this token</h3>`
             },
 
             GetQR_settings(token_){
@@ -218,17 +205,26 @@
                             
                         })
                         .catch((err) => console.log(err));
+                
           },
 
             ShowSettings(){
-                this.showModal = true
 
+                this.showModal = true
                 const path = window.location.pathname
                 var token = path.substring(1)
 
                 this.GetQR_settings(token)
             },
+            
+            RedirectToPage(){
 
+            this.doc_url = '/'+this.token
+            window.location.href = '/'+ this.token
+            this.GetQR_settings(this.token)
+
+          },
+            
         },
 
         mounted() {
@@ -321,7 +317,7 @@
                     
 
                     <div class=" d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%; margin: 20px;" @click="Create_new">Create new</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%; margin: 20px;" @click="ShowInfo">Create new</button>
                         <button class="btn btn-dark btn-lg px-4 " style="width: 45%; margin: 20px;" @click="Join_via_code">Join via code</button>
                     </div>
                 </div>
@@ -354,6 +350,7 @@
                                   <a :href=this.doc_url @click="RedirectToPage" style="text-decoration: none; margin:20px;">
                                     <i class="fas fa-window-close" style="font-size: 40px; color: white; "></i>
                                 </a>
+
                             </div>
 
                 </div>

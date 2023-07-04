@@ -69,9 +69,9 @@ def re_qr(request, token):
 @csrf_exempt
 def Create_new_doc(request):
    
-    code = json.loads(request.body)
-    code = code['code']
-    print(code)
+    #code = json.loads(request.body)
+    #code = code['code']
+    #print(code)
     # Generating a token with a fixed number of characters - 20 should work just fine  
     characters = string.ascii_letters + string.digits
     token = ''.join(random.choice(characters) for _ in range(20))
