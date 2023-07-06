@@ -122,3 +122,21 @@ def re(request, token):
 
 
     return JsonResponse(data, status=200, content_type='application/json', safe=False)
+
+
+
+@api_view(['GET'])
+def check_for_password(request, token_):
+
+    the_doc = Doc.objects.filter(token=token_)
+    if the_doc.passwd != None:
+        print(the_doc.passwd)
+        data = [{'passwd': True}]
+    else: 
+        data = [{'passwd': False}]
+    
+    
+    return JsonResponse(data, status=200, content_type='application/json', safe=False)
+    
+
+    
