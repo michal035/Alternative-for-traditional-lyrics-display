@@ -9,6 +9,7 @@ from django.http import FileResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse
 from . import generate_qr_code
+from .models import Doc
 import string
 import random
 import docx

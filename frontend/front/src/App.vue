@@ -224,6 +224,9 @@
             this.GetQR_settings(this.token)
 
           },
+          IsTheCodeSet(){
+            
+          }
             
         },
 
