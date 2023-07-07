@@ -9,7 +9,7 @@ from django.http import FileResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse
 from . import generate_qr_code
-from .models import Doc
+from .models import doc
 import string
 import random
 import docx
@@ -70,22 +70,26 @@ def re_qr(request, token):
 @csrf_exempt
 def Create_new_doc(request):
    
-    #code = json.loads(request.body)
-    #code = code['code']
-    #print(code)
     # Generating a token with a fixed number of characters - 20 should work just fine  
     characters = string.ascii_letters + string.digits
-    token = ''.join(random.choice(characters) for _ in range(20))
+    token_ = ''.join(random.choice(characters) for _ in range(20))
     
-    #There needs to be check done in DB, if this token already exists 
-    # code + token added to DB
 
-    generate_qr_code.generate_qr(token)
+    the_doc = doc.objects.filter(token=token_)
+    
+    #Further testing required - I guess this just needs to be looped untill condiotion is meet 
+    if the_doc == None:
+        new_record = doc(token=token_)
+        new_record.save()
+    else:
+        JsonResponse(data={"message": ""}, status=500)
 
-    image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token}.jpg"
+    generate_qr_code.generate_qr(token_)
+
+    image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token_}.jpg"
     image_file = open(image_path, 'rb')
 
-    response = JsonResponse(data={"token": token}, status=200)
+    response = JsonResponse(data={"token": token_}, status=200)
 
     return response
 
@@ -128,7 +132,7 @@ def re(request, token):
 @api_view(['GET'])
 def check_for_password(request, token_):
 
-    the_doc = Doc.objects.filter(token=token_)
+    the_doc = doc.objects.filter(token=token_)
     if the_doc.passwd != None:
         print(the_doc.passwd)
         data = [{'passwd': True}]
