@@ -30,12 +30,14 @@ def non(request):
 @csrf_exempt
 def upload_file(request,token):
 
-    print(token)
+    body_data = json.loads(request.body)
+    parameter_value = body_data.get('code')
     # Needs to be added to db ig - yeah the file path 
 
     if request.method == 'POST' and 'file' in request.FILES:
         up_file = request.FILES['file']
 
+        print(request['code'])
         print(up_file.name)
 
         extension = (up_file.name).split(".")[len((up_file.name).split("."))-1]
@@ -49,6 +51,9 @@ def upload_file(request,token):
     
 
         return HttpResponse('File uploaded successfully.', status=200)
+    elif request.headers['code'] != "":
+        print(request['code'])
+    
     else:
         return HttpResponse('File upload failed.', status=400)
 
@@ -76,9 +81,9 @@ def Create_new_doc(request):
     
 
     the_doc = doc.objects.filter(token=token_)
-    
+
     #Further testing required - I guess this just needs to be looped untill condiotion is meet 
-    if the_doc == None:
+    if not the_doc:
         new_record = doc(token=token_)
         new_record.save()
     else:

@@ -29,9 +29,28 @@
 
         methods:{
 
-         send(file) {
+         send(file,the_code_r) {
             const formData = new FormData()
             formData.append('file', file)
+            formData.append('code', the_code_r)
+            
+            
+            const path = window.location.pathname
+            var token = path.substring(1)
+
+
+            console.log('http://127.0.0.1:8000/upload/'+token)
+            fetch('http://127.0.0.1:8000/upload/'+token+'/', {
+              method: 'POST',
+              body: formData,
+            })
+              .then(response => {
+                console.log(response)
+              })
+          },
+          send_just_code(code){
+            const formData = new FormData()
+            formData.append('code', the_code_r)
             
             
             const path = window.location.pathname
@@ -51,19 +70,25 @@
           validate(){
                 
                 var doc = document.querySelector('input[type="file"]')
+                var the_code_r = document.getElementById("the_code_r").value
                 var file = doc.files[0]
                 let extension = (doc.value.split("."))[(doc.value.split(".")).length - 1]
                 
-                
+                console.log(the_code_r)
                 if (extension == "doc" || extension== "docx"){
                    let f_size = file.size
                    f_size = (f_size/1000)/1000
                    if (f_size > 500){
                     console.log("file is too big!")
                    }
-                   this.send(file)
+                   this.send(file,the_code_r)
                 }
-                else{console.log("Unaccepted file type")}
+                else{
+                    if(the_code_r != ""){
+                        console.log(the_code_r)
+                        this.send_just_code(the_code_r)
+                    }
+                    console.log("Unaccepted file type")}
                 
           },
 
