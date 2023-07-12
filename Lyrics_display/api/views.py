@@ -13,11 +13,11 @@ from .models import doc
 import string
 import random
 import docx
-import json 
+import json
 import base64
 
 
-#All of the paths need to be changed to relative paths
+# All of the paths need to be changed to relative paths
 # Some double checks are unnecessary and in some cases I need to add more - I need to log them as well
 
 
@@ -25,34 +25,29 @@ def non(request):
     return HttpResponseNotFound("Token not found")
 
 
-
 @api_view(['POST'])
 @csrf_exempt
-def upload_file(request,token):
+def upload_file(request, token):
 
-    # Needs to be added to db ig - yeah the file path 
+    # There needs to be a password check done - and a warning if password hasnt been set
     if request.method == 'POST' and 'file' in request.FILES:
-  
+
         up_file = request.FILES['file']
         passwd = request.POST.get('code')
-        print(passwd)
-
-        print(up_file.name)
 
         extension = (up_file.name).split(".")[len((up_file.name).split("."))-1]
         file_name = f"file_{token}.{extension}"
 
-        destination = open('/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/' + file_name, 'wb+')
+        destination = open(
+            '/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/' + file_name, 'wb+')
 
         for chunk in up_file.chunks():
             destination.write(chunk)
-        destination.close()  
-    
+        destination.close()
 
         return HttpResponse('File uploaded successfully.', status=200)
     else:
         return HttpResponse('File upload failed.', status=400)
-
 
 
 @api_view(['GET'])
@@ -66,19 +61,17 @@ def re_qr(request, token):
     return response
 
 
-
 @api_view(['POST'])
 @csrf_exempt
 def Create_new_doc(request):
-   
-    # Generating a token with a fixed number of characters - 20 should work just fine  
+
+    # Generating a token with a fixed number of characters - 20 should work just fine
     characters = string.ascii_letters + string.digits
     token_ = ''.join(random.choice(characters) for _ in range(20))
-    
 
     the_doc = doc.objects.filter(token=token_)
 
-    #Further testing required - I guess this just needs to be looped untill condiotion is meet 
+    # Further testing required - I guess this just needs to be looped untill condiotion is meet
     if not the_doc:
         new_record = doc(token=token_)
         new_record.save()
@@ -95,39 +88,35 @@ def Create_new_doc(request):
     return response
 
 
-
 @api_view(['GET'])
 def re(request, token):
 
     print(token)
 
     try:
-        doc = docx.Document(f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/file_{token}.docx")
+        doc = docx.Document(
+            f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/file_{token}.docx")
     except:
         return HttpResponse(status=204)
-    
+
     paragraphs = [p.text for p in doc.paragraphs]
 
     data = [{'paragraph': paragraph} for paragraph in paragraphs]
 
-   
-    # I guess different 'real' paragraphs my be seperated by double blank lines or so 
+    # I guess different 'real' paragraphs my be seperated by double blank lines or so
     index = 0
     while index < len(data) - 1:
         if data[index]['paragraph'] == '' and data[index + 1]['paragraph'] == '':
-            del data[index + 1]  
+            del data[index + 1]
         else:
-            index += 1  
+            index += 1
 
+    # serializer = ParagraphSerializer(data=data, many=True)
+    # serializer.is_valid(raise_exception=True)
 
-    #serializer = ParagraphSerializer(data=data, many=True)
-    #serializer.is_valid(raise_exception=True)
-
-    #return Response(serializer.data)
-
+    # return Response(serializer.data)
 
     return JsonResponse(data, status=200, content_type='application/json', safe=False)
-
 
 
 @api_view(['GET'])
@@ -137,11 +126,7 @@ def check_for_password(request, token_):
     if the_doc.passwd != None:
         print(the_doc.passwd)
         data = [{'passwd': True}]
-    else: 
+    else:
         data = [{'passwd': False}]
-    
-    
-    return JsonResponse(data, status=200, content_type='application/json', safe=False)
-    
 
-    
+    return JsonResponse(data, status=200, content_type='application/json', safe=False)

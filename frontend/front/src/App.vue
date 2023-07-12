@@ -14,7 +14,8 @@
                 showModal_final: false,
                 showmodal_first_page: false,
                 showmodal_join_via_code: false,
-                showmodal_create_new: false,
+                showmodal_create_code: false,
+                showModal_set_code: false,
                 imgUrl: '',
                 token: '',
                 doc_url: ''
@@ -145,7 +146,7 @@
                             this.token = data.token
                             this.imgUrl = imgUrl
                             
-                            this.showmodal_create_new = false
+                            this.showmodal_create_code = false
                             this.showModal_final = true
                             
                         })
@@ -209,7 +210,7 @@
             },
             Create_new(){
                 this.showModal_main = false;
-                this.showmodal_create_new = true;
+                this.showmodal_create_code = true;
             },
             Join_via_code(){
                 this.showModal_main = false;
@@ -260,6 +261,9 @@
             window.location.href = '/'+ this.token
             this.GetQR_settings(this.token)
 
+          },
+          CloseModal_create_code(){
+            this.showmodal_create_code = false;
           },
           IsTheCodeSet(){
             
@@ -382,7 +386,7 @@
                                     <i class="fas fa-download" style="font-size: 40px; color: white; "></i> 
                                 </a>
 
-                                <a href="#" :onclick=this.imgUrl style="text-decoration: none; margin:20px;">
+                                <a href="#" :onclick=this.Create_new style="text-decoration: none; margin:20px;">
                                     <i class="fas fa-lock" style="font-size: 40px; color: white; "></i> 
                                 </a>
 
@@ -434,8 +438,8 @@
         </Modal>
 
  
-        <!-- Create new modal -->
-        <Modal v-if="showmodal_create_new">
+        <!-- Create the code  -->
+        <Modal v-if="showmodal_create_code">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"  style="background: transparent; width: 50%">
                 <div class="modal-content" style="background: transparent;" >
 
@@ -446,7 +450,7 @@
                                    
                     <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
                         <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="ShowInfo">Create</button>
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal">Close</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal_create_code">Close</button>
                     </div>                
                 </div>
             </div>     
@@ -471,6 +475,7 @@
                 </div>
             </div>     
         </Modal> 
+
 
         <h1>{{text}}</h1>
         <div>
