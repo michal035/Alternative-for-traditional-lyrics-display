@@ -30,14 +30,13 @@ def non(request):
 @csrf_exempt
 def upload_file(request,token):
 
-    body_data = json.loads(request.body)
-    parameter_value = body_data.get('code')
     # Needs to be added to db ig - yeah the file path 
-
     if request.method == 'POST' and 'file' in request.FILES:
+  
         up_file = request.FILES['file']
+        passwd = request.POST.get('code')
+        print(passwd)
 
-        print(request['code'])
         print(up_file.name)
 
         extension = (up_file.name).split(".")[len((up_file.name).split("."))-1]
@@ -51,9 +50,6 @@ def upload_file(request,token):
     
 
         return HttpResponse('File uploaded successfully.', status=200)
-    elif request.headers['code'] != "":
-        print(request['code'])
-    
     else:
         return HttpResponse('File upload failed.', status=400)
 

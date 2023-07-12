@@ -30,28 +30,40 @@
         methods:{
 
          send(file,the_code_r) {
-            const formData = new FormData()
-            formData.append('file', file)
-            formData.append('code', the_code_r)
             
-            
-            const path = window.location.pathname
-            var token = path.substring(1)
+            const encoder = new TextEncoder()
+            const data = encoder.encode(the_code_r)
+
+            crypto.subtle.digest('SHA-256', data)
+                .then(hashBuffer => {
+                var hashArray = Array.from(new Uint8Array(hashBuffer))
+                var hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('')
+                
+                //console.log('SHA-256 Hash:', hashHex)
+
+                const formData = new FormData()
+                formData.append('file', file)
+                formData.append('code', hashHex)
 
 
-            console.log('http://127.0.0.1:8000/upload/'+token)
-            fetch('http://127.0.0.1:8000/upload/'+token+'/', {
-              method: 'POST',
-              body: formData,
-            })
-              .then(response => {
-                console.log(response)
-              })
+                const path = window.location.pathname
+                var token = path.substring(1)
+
+
+                console.log('http://127.0.0.1:8000/upload/'+token)
+                fetch('http://127.0.0.1:8000/upload/'+token+'/', {
+                method: 'POST',
+                body: formData,
+                })
+                .then(response => {
+                    console.log(response)
+                })
+
+                })
+            
           },
-          send_just_code(code){
-            const formData = new FormData()
-            formData.append('code', the_code_r)
-            
+          send_just_code(code_){
+            const data = {code: code_}
             
             const path = window.location.pathname
             var token = path.substring(1)
@@ -60,7 +72,7 @@
             console.log('http://127.0.0.1:8000/upload/'+token)
             fetch('http://127.0.0.1:8000/upload/'+token+'/', {
               method: 'POST',
-              body: formData,
+              body: JSON.stringify(data),
             })
               .then(response => {
                 console.log(response)
