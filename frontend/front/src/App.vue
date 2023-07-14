@@ -208,6 +208,10 @@
                     console.error('Error', error);
                     });  
             },
+            SetPasswd(){
+                let p = document.getElementById("the_passwd").value
+                //call an API
+            },
             Create_new(){
                 this.showModal_main = false;
                 this.showmodal_create_code = true;
@@ -445,11 +449,11 @@
 
                     <div class="modal-body d-flex justify-content-center" style="width: 100%">
                         <br>
-                        <input class="form-control outline-danger" placeholder="Type in the code - this will alow you to make changes, treat this like a password" type="text" id="the_code">
+                        <input class="form-control outline-danger" placeholder="Type in the code - this will alow you to make changes, treat this like a password" type="text" id="the_passwd">
                     </div>
                                    
                     <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="ShowInfo">Create</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="SetPasswd">Create</button>
                         <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal_create_code">Close</button>
                     </div>                
                 </div>

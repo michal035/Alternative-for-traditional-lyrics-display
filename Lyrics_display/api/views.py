@@ -130,3 +130,17 @@ def check_for_password(request, token_):
         data = [{'passwd': False}]
 
     return JsonResponse(data, status=200, content_type='application/json', safe=False)
+
+
+@api_view(['POST'])
+def set_password(request, token_):
+
+    body = request.data
+    passwd = body.get["code"]
+
+    record = doc.objects.get(token=token_)
+    record.passwd = passwd
+
+    record.save()
+
+    return HttpResponse(status=201)
