@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view
 from django.http import FileResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse
+from django.shortcuts import get_object_or_404
 from . import generate_qr_code
 from .models import doc
 import string
@@ -122,7 +123,8 @@ def re(request, token):
 @api_view(['GET'])
 def check_for_password(request, token_):
 
-    the_doc = doc.objects.filter(token=token_)
+    the_doc = get_object_or_404(doc, token=token_)
+    print(the_doc)
     if the_doc.passwd != None:
         print(the_doc.passwd)
         data = [{'passwd': True}]
@@ -136,10 +138,10 @@ def check_for_password(request, token_):
 def set_password(request, token_):
 
     body = request.data
-    passwd = body.get["code"]
+    password = body.get["code"]
 
     record = doc.objects.get(token=token_)
-    record.passwd = passwd
+    record.passwd = password
 
     record.save()
 

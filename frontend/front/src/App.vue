@@ -16,6 +16,7 @@
                 showmodal_join_via_code: false,
                 showmodal_create_code: false,
                 showModal_set_code: false,
+                showPasswdDiv: false,
                 imgUrl: '',
                 token: '',
                 doc_url: ''
@@ -251,10 +252,23 @@
           },
 
             ShowSettings(){
-
+                
                 this.showModal = true
                 const path = window.location.pathname
                 var token = path.substring(1)
+
+
+                const requestOptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                }
+
+                        fetch("http://127.0.0.1:8000/" + token + "/check")
+                            .then(response => {console.log(response.json())}) 
+                            .catch((err) => console.log(err));
+                
 
                 this.GetQR_settings(token)
             },
@@ -411,7 +425,7 @@
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="background: transparent; width: 50%">
                 <div class="modal-content" id="the" style="background: transparent;" >
                     
-                    <div class="modal-body d-flex justify-content-center" style="width: 100%">
+                    <div v-if="showPasswdDiv" class="modal-body d-flex justify-content-center" style="width: 100%">
                         <br>
                         <input class="form-control outline-danger" placeholder="Type in the code " type="text" id="the_code_r">
                     </div>
