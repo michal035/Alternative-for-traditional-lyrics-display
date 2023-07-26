@@ -138,7 +138,7 @@ def check_for_password(request, token_):
 def set_password(request, token_):
 
     body = request.data
-    password = body.get["code"]
+    password = body["code"]
 
     record = doc.objects.get(token=token_)
     record.passwd = password

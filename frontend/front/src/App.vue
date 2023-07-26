@@ -211,8 +211,36 @@
                     });  
             },
             SetPasswd(){
-                let p = document.getElementById("the_passwd").value
+               let p_value = document.getElementById("the_passwd").value
+
+                const encoder = new TextEncoder()
+                const data = encoder.encode(p_value)
                 //call an API
+               crypto.subtle.digest('SHA-256', data)
+                    .then(hashBuffer => {
+                    var hashArray = Array.from(new Uint8Array(hashBuffer))
+                    var hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('')
+                    
+
+                    var data = {code: hashHex}
+
+                    const requestOptions = {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    }
+                    
+                    fetch("http://127.0.0.1:8000/"+this.token+"/set", requestOptions)
+                   .then((response) => {
+                    this.showmodal_create_code = false
+                      return response
+                    })
+                    })
+                    .catch(error => {
+                    console.error('Error', error);
+                    }); 
             },
             Create_new(){
                 this.showModal_main = false;
