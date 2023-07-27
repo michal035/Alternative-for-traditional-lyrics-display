@@ -295,16 +295,15 @@
                 }
 
                 fetch("http://127.0.0.1:8000/" + token + "/check")
-                    .then(function(serverPromise){  
-                    serverPromise.json()
-                        .then(function(j) { 
-                        if(j[0]["passwd"] == true){this.showPasswdDiv = true}
-                        })
-                        .catch(function(e){
-                        console.log(e);
-                        });
-                    }) 
-                    .catch((err) => console.log(err));
+                .then((serverPromise) => serverPromise.json())
+                .then((j) => {
+                if (j[0]["passwd"] == true) {
+                    this.showPasswdDiv = true;
+                }
+                })
+                .catch((error) => {
+                console.log(error);
+                });
                 
 
                 this.GetQR_settings(token)
