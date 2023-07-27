@@ -28,7 +28,7 @@ def non(request):
 
 @api_view(['POST'])
 @csrf_exempt
-def upload_file(request, token):
+def upload_file(request, token_):
 
     # There needs to be a password check done - and a warning if password hasnt been set
     if request.method == 'POST' and 'file' in request.FILES:
@@ -36,8 +36,13 @@ def upload_file(request, token):
         up_file = request.FILES['file']
         passwd = request.POST.get('code')
 
+        the_doc = get_object_or_404(doc, token=token_)
+        if the_doc.passwd != passwd:
+            #This sould be logged
+            return HttpResponse('Invalid password.', status=401)
+
         extension = (up_file.name).split(".")[len((up_file.name).split("."))-1]
-        file_name = f"file_{token}.{extension}"
+        file_name = f"file_{token_}.{extension}"
 
         destination = open(
             '/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/' + file_name, 'wb+')
@@ -124,9 +129,8 @@ def re(request, token):
 def check_for_password(request, token_):
 
     the_doc = get_object_or_404(doc, token=token_)
-    print(the_doc)
     if the_doc.passwd != None:
-        print(the_doc.passwd)
+
         data = [{'passwd': True}]
     else:
         data = [{'passwd': False}]
