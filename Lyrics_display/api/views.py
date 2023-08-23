@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from . import generate_qr_code
-from .models import doc
+from .models import User, Doc
 import string
 import random
 import docx
@@ -36,9 +36,9 @@ def upload_file(request, token_):
         up_file = request.FILES['file']
         passwd = request.POST.get('code')
 
-        the_doc = get_object_or_404(doc, token=token_)
+        the_doc = get_object_or_404(Doc, token=token_)
         if the_doc.passwd != passwd:
-            #This sould be logged
+            # This sould be logged
             return HttpResponse('Invalid password.', status=401)
 
         extension = (up_file.name).split(".")[len((up_file.name).split("."))-1]
@@ -54,6 +54,15 @@ def upload_file(request, token_):
         return HttpResponse('File uploaded successfully.', status=200)
     else:
         return HttpResponse('File upload failed.', status=400)
+
+
+@api_view(['POST'])
+def login(request):
+
+    username = request.body.get("username")
+    password = request.body.get("password")
+
+    return HttpResponse("Success", status=200)
 
 
 @api_view(['GET'])
@@ -75,11 +84,14 @@ def Create_new_doc(request):
     characters = string.ascii_letters + string.digits
     token_ = ''.join(random.choice(characters) for _ in range(20))
 
-    the_doc = doc.objects.filter(token=token_)
+    the_doc = User.objects.filter(token=token_)
 
-    # Further testing required - I guess this just needs to be looped untill condiotion is meet
+    #THis needs to get data from JWT
+    username = "username"
+    user_obj = User.objects.get(user=username)
+
     if not the_doc:
-        new_record = doc(token=token_)
+        new_record = Doc(token=token_, user=user_obj)
         new_record.save()
     else:
         JsonResponse(data={"message": ""}, status=500)
@@ -128,7 +140,7 @@ def re(request, token):
 @api_view(['GET'])
 def check_for_password(request, token_):
 
-    the_doc = get_object_or_404(doc, token=token_)
+    the_doc = get_object_or_404(Doc, token=token_)
     if the_doc.passwd != None:
 
         data = [{'passwd': True}]
@@ -138,14 +150,16 @@ def check_for_password(request, token_):
     return JsonResponse(data, status=200, content_type='application/json', safe=False)
 
 
+
+#This needs to be remade - like this is not even needed at this point 
 @api_view(['POST'])
 def set_password(request, token_):
 
     body = request.data
     password = body["code"]
 
-    record = doc.objects.get(token=token_)
-    record.passwd = password
+    record = Doc.objects.get(token=token_)
+    #record.passwd = password
 
     record.save()
 
