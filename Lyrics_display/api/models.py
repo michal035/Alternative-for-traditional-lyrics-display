@@ -9,5 +9,5 @@ class User(models.Model):
 
 class Doc(models.Model):
     token = models.CharField(max_length=20)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
