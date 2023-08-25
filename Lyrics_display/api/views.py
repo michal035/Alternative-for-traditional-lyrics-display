@@ -23,20 +23,59 @@ import base64
 # All of the paths need to be changed to relative paths
 # Some double checks are unnecessary and in some cases I need to add more - I need to log them as well
 
+# hardcoded just for now
 global secret_key
 secret_key = "tncV0f771WGyvUR9U4LFtHf213NdsjJdas"
 
 
-def non(request):
-    return HttpResponseNotFound("Token not found")
+def barer_token_verification(token):
+
+    token = token.replace('Bearer ', '')
+    try:
+        decoded_token = jwt.decode(token, secret_key, algorithms=["HS256"])
+        return {decoded_token, 200}
+    except jwt.ExpiredSignatureError:
+        return ({"message": "Token has expired"}, 401)
+    except jwt.DecodeError:
+        return ({"message": "Invalid token"}, 401)
+
+
+@api_view(['POST'])
+def login(request):
+
+    data = json.loads(request.body.decode('utf-8'))
+    username_ = data.get("username")
+    password = data.get("password")
+
+    try:
+        user = User.objects.filter(username=username_).first()
+
+        if ((users_password := user.passwd) == password):
+            token_payload = {
+                "username": username_,
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+            }
+            token = jwt.encode(
+                token_payload, secret_key, algorithm="HS256")
+
+            print(token)
+            return JsonResponse(data={"token": token, "username": username_}, status=200)
+        else:
+            return HttpResponse("Wrong credentials", status=401)
+
+    except:
+        # This needs to be logged
+        return HttpResponse("Wrong credentials", status=401)
 
 
 @api_view(['POST'])
 @csrf_exempt
 def upload_file(request, token_):
 
-    # There needs to be a password check done - and a warning if password hasnt been set
-    if request.method == 'POST' and 'file' in request.FILES:
+    authorization_header = request.META.get('HTTP_AUTHORIZATION')
+
+    return HttpResponse(authorization_header, status=200)
+    """if request.method == 'POST' and 'file' in request.FILES:
 
         up_file = request.FILES['file']
         passwd = request.POST.get('code')
@@ -58,35 +97,7 @@ def upload_file(request, token_):
 
         return HttpResponse('File uploaded successfully.', status=200)
     else:
-        return HttpResponse('File upload failed.', status=400)
-
-
-@api_view(['POST'])
-def login(request):
-
-    data = json.loads(request.body.decode('utf-8'))
-    username_ = data.get("username")
-    password = data.get("password")
-
-    try:
-        user = User.objects.filter(username=username_).first()
-
-        if ((users_password := user.passwd) == password):
-            token_payload = {
-                "username": username_,
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),  # Token expiration time
-            }
-            token = jwt.encode(
-                token_payload, secret_key, algorithm="HS256")
-
-            print(token)
-            return JsonResponse(data={"token": token, "username": username_}, status=200)
-        else:
-            return HttpResponse("Wrong credentials", status=401)
-
-    except:
-        # This needs to be logged
-        return HttpResponse("Wrong credentials", status=401)
+        return HttpResponse('File upload failed.', status=400)"""
 
 
 @api_view(['GET'])
@@ -187,3 +198,7 @@ def set_password(request, token_):
     record.save()
 
     return HttpResponse(status=201)
+
+
+def non(request):
+    return HttpResponseNotFound("Token not found")
