@@ -33,7 +33,7 @@ def barer_token_verification(token):
     token = token.replace('Bearer ', '')
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=["HS256"])
-        return {decoded_token, 200}
+        return {decoded_token["username"], 200}
     except jwt.ExpiredSignatureError:
         return ({"message": "Token has expired"}, 401)
     except jwt.DecodeError:
@@ -59,10 +59,9 @@ def login(request):
                 token_payload, secret_key, algorithm="HS256")
 
             print(token)
-            return JsonResponse(data={"token": token, "username": username_}, status=200)
+            return JsonResponse(data={"token": (str(token)[2:])[:-1], "username": username_}, status=200)
         else:
             return HttpResponse("Wrong credentials", status=401)
-
     except:
         # This needs to be logged
         return HttpResponse("Wrong credentials", status=401)
@@ -73,31 +72,33 @@ def login(request):
 def upload_file(request, token_):
 
     authorization_header = request.META.get('HTTP_AUTHORIZATION')
+    res = barer_token_verification(authorization_header)
 
-    return HttpResponse(authorization_header, status=200)
-    """if request.method == 'POST' and 'file' in request.FILES:
+    if ((res := tuple(res))[0] == 200):
+        if request.method == 'POST' and 'file' in request.FILES:
 
-        up_file = request.FILES['file']
-        passwd = request.POST.get('code')
+            the_doc = get_object_or_404(Doc, token=token_)
+            if (the_doc.user.username == res[1]):
 
-        the_doc = get_object_or_404(Doc, token=token_)
-        if the_doc.passwd != passwd:
-            # This sould be logged
-            return HttpResponse('Invalid password.', status=401)
+                up_file = request.FILES['file']
 
-        extension = (up_file.name).split(".")[len((up_file.name).split("."))-1]
-        file_name = f"file_{token_}.{extension}"
+                extension = (up_file.name).split(".")[
+                    len((up_file.name).split("."))-1]
+                file_name = f"file_{token_}.{extension}"
 
-        destination = open(
-            '/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/' + file_name, 'wb+')
+                destination = open(
+                    '/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/' + file_name, 'wb+')
 
-        for chunk in up_file.chunks():
-            destination.write(chunk)
-        destination.close()
+                for chunk in up_file.chunks():
+                    destination.write(chunk)
+                destination.close()
 
-        return HttpResponse('File uploaded successfully.', status=200)
+                return HttpResponse('File uploaded successfully.', status=200)
+        else:
+            return HttpResponse('File upload failed.', status=400)
     else:
-        return HttpResponse('File upload failed.', status=400)"""
+
+        return HttpResponse(res[0]["message"], status=int(res[1]))
 
 
 @api_view(['GET'])
