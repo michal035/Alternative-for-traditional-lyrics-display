@@ -11,6 +11,8 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from . import generate_qr_code
 from .models import User, Doc
+import datetime
+import jwt
 import string
 import random
 import docx
@@ -20,6 +22,9 @@ import base64
 
 # All of the paths need to be changed to relative paths
 # Some double checks are unnecessary and in some cases I need to add more - I need to log them as well
+
+global secret_key
+secret_key = "tncV0f771WGyvUR9U4LFtHf213NdsjJdas"
 
 
 def non(request):
@@ -59,10 +64,29 @@ def upload_file(request, token_):
 @api_view(['POST'])
 def login(request):
 
-    username = request.body.get("username")
-    password = request.body.get("password")
+    data = json.loads(request.body.decode('utf-8'))
+    username_ = data.get("username")
+    password = data.get("password")
 
-    return HttpResponse("Success", status=200)
+    try:
+        user = User.objects.filter(username=username_).first()
+
+        if ((users_password := user.passwd) == password):
+            token_payload = {
+                "username": username_,
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),  # Token expiration time
+            }
+            token = jwt.encode(
+                token_payload, secret_key, algorithm="HS256")
+
+            print(token)
+            return JsonResponse(data={"token": token, "username": username_}, status=200)
+        else:
+            return HttpResponse("Wrong credentials", status=401)
+
+    except:
+        # This needs to be logged
+        return HttpResponse("Wrong credentials", status=401)
 
 
 @api_view(['GET'])
@@ -86,7 +110,7 @@ def Create_new_doc(request):
 
     the_doc = User.objects.filter(token=token_)
 
-    #THis needs to get data from JWT
+    # THis needs to get data from JWT
     username = "username"
     user_obj = User.objects.get(user=username)
 
@@ -150,8 +174,7 @@ def check_for_password(request, token_):
     return JsonResponse(data, status=200, content_type='application/json', safe=False)
 
 
-
-#This needs to be remade - like this is not even needed at this point 
+# This needs to be remade - like this is not even needed at this point
 @api_view(['POST'])
 def set_password(request, token_):
 
@@ -159,7 +182,7 @@ def set_password(request, token_):
     password = body["code"]
 
     record = Doc.objects.get(token=token_)
-    #record.passwd = password
+    # record.passwd = password
 
     record.save()
 
