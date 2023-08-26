@@ -17,6 +17,7 @@ import string
 import random
 import docx
 import json
+import os
 import base64
 
 
@@ -71,45 +72,56 @@ def login(request):
 @csrf_exempt
 def upload_file(request, token_):
 
-    authorization_header = request.META.get('HTTP_AUTHORIZATION')
-    res = barer_token_verification(authorization_header)
+    if (authorization_header := request.META.get('HTTP_AUTHORIZATION')):
+        res = barer_token_verification(authorization_header)
 
-    if ((res := tuple(res))[0] == 200):
-        if request.method == 'POST' and 'file' in request.FILES:
+        if ((res := tuple(res))[0] == 200):
+            if request.method == 'POST' and 'file' in request.FILES:
 
-            the_doc = get_object_or_404(Doc, token=token_)
-            if (the_doc.user.username == res[1]):
+                the_doc = get_object_or_404(Doc, token=token_)
+                if (the_doc.user.username == res[1]):
 
-                up_file = request.FILES['file']
+                    up_file = request.FILES['file']
 
-                extension = (up_file.name).split(".")[
-                    len((up_file.name).split("."))-1]
-                file_name = f"file_{token_}.{extension}"
+                    extension = (up_file.name).split(".")[
+                        len((up_file.name).split("."))-1]
+                    file_name = f"file_{token_}.{extension}"
 
-                destination = open(
-                    '/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/' + file_name, 'wb+')
+                    destination = open(
+                        '/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/' + file_name, 'wb+')
 
-                for chunk in up_file.chunks():
-                    destination.write(chunk)
-                destination.close()
+                    for chunk in up_file.chunks():
+                        destination.write(chunk)
+                    destination.close()
 
-                return HttpResponse('File uploaded successfully.', status=200)
+                    return HttpResponse('File uploaded successfully.', status=200)
+            else:
+                return HttpResponse('File upload failed.', status=400)
         else:
-            return HttpResponse('File upload failed.', status=400)
+            return HttpResponse(res[0]["message"], status=int(res[1]))
     else:
-
-        return HttpResponse(res[0]["message"], status=int(res[1]))
+        return HttpResponse("Authorization header not present", status=401)
 
 
 @api_view(['GET'])
 def re_qr(request, token):
 
-    image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token}.jpg"
-    image_file = open(image_path, 'rb')
+    if (authorization_header := request.META.get('HTTP_AUTHORIZATION')):
+        res = barer_token_verification(authorization_header)
+        if ((res := tuple(res))[0] == 200):
+            image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token}.jpg"
+            if not os.path.exists(image_path):
+                return HttpResponse("QR code not found ", status=404)
+            image_file = open(image_path, 'rb')
 
-    response = FileResponse(image_file, content_type='image/jpeg', status=200)
+            response = FileResponse(
+                image_file, content_type='image/jpeg', status=200)
 
-    return response
+            return response
+        else:
+            return HttpResponse(res[0]["message"], status=int(res[1]))
+    else:
+        return HttpResponse("Authorization header not present", status=401)
 
 
 @api_view(['POST'])
