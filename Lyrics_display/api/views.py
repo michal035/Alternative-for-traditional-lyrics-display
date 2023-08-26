@@ -128,30 +128,38 @@ def re_qr(request, token):
 @csrf_exempt
 def Create_new_doc(request):
 
-    # Generating a token with a fixed number of characters - 20 should work just fine
-    characters = string.ascii_letters + string.digits
-    token_ = ''.join(random.choice(characters) for _ in range(20))
+    if (authorization_header := request.META.get('HTTP_AUTHORIZATION')):
+        res = barer_token_verification(authorization_header)
 
-    the_doc = User.objects.filter(token=token_)
+        # Generating a token with a fixed number of characters - 20 should work just fine
+        characters = string.ascii_letters + string.digits
+        token_ = ''.join(random.choice(characters) for _ in range(20))
 
-    # THis needs to get data from JWT
-    username = "username"
-    user_obj = User.objects.get(user=username)
+        if ((res := tuple(res))[0] == 200):
+            username_ = (tuple(res))[1]
+            user_obj = User.objects.get(username=username_)
 
-    if not the_doc:
-        new_record = Doc(token=token_, user=user_obj)
-        new_record.save()
+            if (not (the_doc := Doc.objects.filter(token=token_))):
+                new_record = Doc(token=token_, user=user_obj)
+                new_record.save()
+
+                return HttpResponse("Resource successfully created", status=201)
+            else:
+                JsonResponse(
+                    data={"message": "Resource not found"}, status=404)
+
+            generate_qr_code.generate_qr(token_)
+
+            # image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token_}.jpg"
+            # image_file = open(image_path, 'rb')
+
+            response = JsonResponse(data={"token": token_}, status=200)
+
+            return response
+        else:
+            return HttpResponse(res[0]["message"], status=int(res[1]))
     else:
-        JsonResponse(data={"message": ""}, status=500)
-
-    generate_qr_code.generate_qr(token_)
-
-    image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token_}.jpg"
-    image_file = open(image_path, 'rb')
-
-    response = JsonResponse(data={"token": token_}, status=200)
-
-    return response
+        return HttpResponse("Authorization header not present", status=401)
 
 
 @api_view(['GET'])
