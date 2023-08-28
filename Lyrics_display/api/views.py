@@ -193,5 +193,19 @@ def re(request, token):
     return JsonResponse(data, status=200, content_type='application/json', safe=False)
 
 
+@api_view(['POST'])
+def create_new_account(request):
+
+    data = json.loads(request.body.decode('utf-8'))
+    username_ = data.get("username")
+    password = data.get("password")
+
+    if (not User.filter(username=username_)):
+        new_record = User(username=username_, passwd=password)
+        new_record.save()
+    else:
+        return HttpResponse("User already exists", status=409)
+
+
 def non(request):
     return HttpResponseNotFound("Token not found")
