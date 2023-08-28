@@ -165,7 +165,7 @@ def Create_new_doc(request):
 @api_view(['GET'])
 def re(request, token):
 
-    print(token)
+    # No need to log in for this one
 
     try:
         doc = docx.Document(
@@ -191,34 +191,6 @@ def re(request, token):
     # return Response(serializer.data)
 
     return JsonResponse(data, status=200, content_type='application/json', safe=False)
-
-
-@api_view(['GET'])
-def check_for_password(request, token_):
-
-    the_doc = get_object_or_404(Doc, token=token_)
-    if the_doc.passwd != None:
-
-        data = [{'passwd': True}]
-    else:
-        data = [{'passwd': False}]
-
-    return JsonResponse(data, status=200, content_type='application/json', safe=False)
-
-
-# This needs to be remade - like this is not even needed at this point
-@api_view(['POST'])
-def set_password(request, token_):
-
-    body = request.data
-    password = body["code"]
-
-    record = Doc.objects.get(token=token_)
-    # record.passwd = password
-
-    record.save()
-
-    return HttpResponse(status=201)
 
 
 def non(request):
