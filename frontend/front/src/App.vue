@@ -102,17 +102,15 @@ export default {
     },
 
     CloseModal(modalName) {
+      this.showPasswdDiv = false
       this[modalName] = false;
       location.reload();
     },
-
-    CloseModal_main() {
-      this.showModal_main = false;
-      // I guess the doc not found should be called or if it got reated it should be redirected to the right page
-      location.reload();
-    },
-    CloseModalv3() {
-      this.showModal = false;
+    OpenModal(modalNameToBeOpen, modalName = "") {
+      if (modalName != "") {
+        this[modalName] = false;
+      }
+      this[modalNameToBeOpen] = true;
       location.reload();
     },
 
@@ -141,11 +139,6 @@ export default {
           this.showModal_final = true;
         })
         .catch((err) => console.log(err));
-    },
-
-    NewDocument() {
-      console.log("new doc");
-      this.showModal_main = true;
     },
 
     ShowInfo() {
@@ -233,14 +226,7 @@ export default {
           console.error("Error", error);
         });
     },
-    Create_new() {
-      this.showModal_main = false;
-      this.showmodal_create_code = true;
-    },
-    Join_via_code() {
-      this.showModal_main = false;
-      this.showmodal_join_via_code = true;
-    },
+
     notFound() {
       var the_doc = document.getElementById("main");
       the_doc.innerHTML = `<br> <h3>No document associated with this token</h3>`;
@@ -299,10 +285,6 @@ export default {
       window.location.href = "/" + this.token;
       this.GetQR_settings(this.token);
     },
-    CloseModal_create_code() {
-      this.showmodal_create_code = false;
-    },
-    IsTheCodeSet() {},
   },
 
   mounted() {
@@ -386,7 +368,7 @@ export default {
 
                     <div class=" d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
                         <button class="btn btn-dark btn-lg px-4 " style="width: 45%; margin: 20px;" @click="ShowInfo">Create new</button>
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%; margin: 20px;" @click="Join_via_code">Join via code</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%; margin: 20px;" @click="OpenModal('showmodal_join_via_code','showModal_main')">Join via code</button>
                     </div>
                 </div>
                     
@@ -428,7 +410,7 @@ export default {
                                     <i class="fas fa-download" style="font-size: 40px; color: white; "></i> 
                                 </a>
 
-                                <a href="#" :onclick=this.Create_new style="text-decoration: none; margin:20px;">
+                                <a href="#" @click="OpenModal('showmodal_create_code','showModal_main')" style="text-decoration: none; margin:20px;">
                                     <i class="fas fa-lock" style="font-size: 40px; color: white; "></i> 
                                 </a>
 
@@ -441,7 +423,7 @@ export default {
 
                 </div>
                        
-        </Modal>
+        </Modal>                                 
 
         <!--  
             This is main settings pop up - there needs to be a login option
@@ -464,7 +446,7 @@ export default {
                     </div>
                     <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
                         <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="validate">Save</button>
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal">Close</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal('showModal')">Close</button>
                     </div>
                     <br>
                     <br>
@@ -496,7 +478,7 @@ export default {
                                    
                     <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
                         <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="SetPasswd">Create</button>
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal_create_code">Close</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal('showmodal_create_code')">Close</button>
                     </div>                
                 </div>
             </div>     
@@ -518,7 +500,7 @@ export default {
                                 
                     <div class="modal-footer d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
                         <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="RedirectToPage_from_join_modal">Join</button>
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal">Close</button>
+                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%;" @click="CloseModal('ShowModal')">Close</button>
                     </div>                
                       
                 </div>
