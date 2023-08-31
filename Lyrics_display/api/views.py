@@ -143,19 +143,18 @@ def Create_new_doc(request):
                 new_record = Doc(token=token_, user=user_obj)
                 new_record.save()
 
-                return HttpResponse("Resource successfully created", status=201)
+                return JsonResponse( data="Resource successfully created", status=201, safe=False)
             else:
                 JsonResponse(
-                    data={"message": "Resource not found"}, status=404)
+                    data={"message": "Resource not found"}, status=404, safe=False)
 
             generate_qr_code.generate_qr(token_)
 
             # image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token_}.jpg"
             # image_file = open(image_path, 'rb')
 
-            response = JsonResponse(data={"token": token_}, status=200)
-
-            return response
+            return JsonResponse(data={"token": token_}, status=200, safe=False)
+            
         else:
             return HttpResponse(res[0]["message"], status=int(res[1]))
     else:

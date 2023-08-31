@@ -31,48 +31,11 @@ export default {
 
   methods: {
     send(file, the_code_r) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(the_code_r);
-
-      crypto.subtle.digest("SHA-256", data).then((hashBuffer) => {
-        var hashArray = Array.from(new Uint8Array(hashBuffer));
-        var hashHex = hashArray
-          .map((byte) => byte.toString(16).padStart(2, "0"))
-          .join("");
-
-        //console.log('SHA-256 Hash:', hashHex)
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("code", hashHex);
-
-        const path = window.location.pathname;
-        var token = path.substring(1);
-
-        console.log("http://127.0.0.1:8000/upload/" + token);
-        fetch("http://127.0.0.1:8000/upload/" + token + "/", {
-          method: "POST",
-          body: formData,
-        }).then((response) => {
-          console.log(response);
-        });
-      });
+      // Your send method code here
     },
     send_just_code(code_) {
-      const data = { code: code_ };
-
-      const path = window.location.pathname;
-      var token = path.substring(1);
-
-      console.log("http://127.0.0.1:8000/upload/" + token);
-      fetch("http://127.0.0.1:8000/upload/" + token + "/", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }).then((response) => {
-        console.log(response);
-      });
+      // Your send_just_code method code here
     },
-
     validate() {
       var doc = document.querySelector('input[type="file"]');
       var the_code_r = document.getElementById("the_code_r").value;
@@ -95,42 +58,32 @@ export default {
         console.log("Unaccepted file type");
       }
     },
-
     RedirectToPage_from_join_modal() {
       this.doc_url = "/" + document.getElementById("join_token").value;
       window.location.href = this.doc_url;
     },
-
     CloseModal(modalName) {
-      this.showPasswdDiv = false
+      this.showPasswdDiv = false;
       this[modalName] = false;
       location.reload();
     },
-    OpenModal(modalNameToBeOpen, modalName = "") {
+    OpenModal(modalNameToBeOpen, modalName = null, isFirst = false) {
       if (modalName != "") {
         this[modalName] = false;
       }
       this[modalNameToBeOpen] = true;
-      location.reload();
-    },
 
+      if (isFirst == false) {
+        location.reload();
+      }
+    },
     GetQR(token_) {
       var data = { token: token_ };
-
-      const requestOptions = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      };
 
       fetch("http://127.0.0.1:8000/" + token_ + "/qr")
         .then((response) => response.blob())
         .then((blob) => {
           var imgUrl = URL.createObjectURL(blob);
-
-          //var modal_div = document.getElementById("create_new");
 
           this.token = data.token;
           this.imgUrl = imgUrl;
@@ -141,61 +94,52 @@ export default {
         .catch((err) => console.log(err));
     },
 
+     getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+      },
+    
+
     ShowInfo() {
-      //var code = document.getElementById("the_code").value
-      this.showModal_main = false;
-      var code = "tempCode";
-      //document.getElementById("create_new").innerHTML = ""
+      //temp cookie set up
+      document.cookie = `bearerToken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im5ld191c2VybmFtZTMiLCJleHAiOjE2OTM0NjQ3NzJ9.4dTKczpsFmFbRW9H1_exIIvyj0DNTr5wi1jpq2yS1Fo; path=/;`;
 
-      if (!code) {
-        console.error("No input provided");
-        return;
-      }
+        if (document.cookie){
+        const cookie = this.getCookie("bearerToken");
+        
+        console.log(cookie);
+        this.showModal_main = false;
 
-      const encoder = new TextEncoder();
-      const data = encoder.encode(code);
+        var data = { code: "d" };
 
-      crypto.subtle
-        .digest("SHA-256", data)
-        .then((hashBuffer) => {
-          var hashArray = Array.from(new Uint8Array(hashBuffer));
-          var hashHex = hashArray
-            .map((byte) => byte.toString(16).padStart(2, "0"))
-            .join("");
+        const requestOptions = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookie}`,
+          },
+          body: JSON.stringify(data),
+        };
 
-          console.log("SHA-256 Hash:", hashHex);
-
-          var data = { code: hashHex };
-
-          const requestOptions = {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          };
-
-          fetch("http://127.0.0.1:8000/create-new", requestOptions)
-            .then((response) => {
-              return response.json();
-            })
-            .then((data) => {
-              console.log(data.token);
-              var modal_div = document.getElementById("create_new");
-
-              this.GetQR(data.token);
-            });
-        })
-        .catch((error) => {
-          console.error("Error", error);
-        });
+        fetch("http://127.0.0.1:8000/create-new", requestOptions)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.token);
+            this.GetQR(data.token);
+          });
+        }
+        //login page 
+        else{
+          
+        }
     },
     SetPasswd() {
       let p_value = document.getElementById("the_passwd").value;
 
       const encoder = new TextEncoder();
       const data = encoder.encode(p_value);
-      //call an API
+
       crypto.subtle
         .digest("SHA-256", data)
         .then((hashBuffer) => {
@@ -226,22 +170,12 @@ export default {
           console.error("Error", error);
         });
     },
-
     notFound() {
       var the_doc = document.getElementById("main");
       the_doc.innerHTML = `<br> <h3>No document associated with this token</h3>`;
     },
-
     GetQR_settings(token_) {
       var data = { token: token_ };
-
-      const requestOptions = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      };
 
       fetch("http://127.0.0.1:8000/" + token_ + "/qr")
         .then((response) => response.blob())
@@ -253,7 +187,6 @@ export default {
         })
         .catch((err) => console.log(err));
     },
-
     ShowSettings() {
       this.showModal = true;
       const path = window.location.pathname;
@@ -279,14 +212,12 @@ export default {
 
       this.GetQR_settings(token);
     },
-
     RedirectToPage() {
       this.doc_url = "/" + this.token;
       window.location.href = "/" + this.token;
       this.GetQR_settings(this.token);
     },
   },
-
   mounted() {
     const path = window.location.pathname;
     var token = path.substring(1);
@@ -296,7 +227,7 @@ export default {
         if (response.status == 200) {
           return response.json();
         } else if (response.status === 404) {
-          this.NewDocument();
+          this.OpenModal("showModal_main", null, true);
           throw new Error("Resource not found");
         } else if (response.status === 204) {
           this.notFound();
@@ -305,7 +236,6 @@ export default {
           throw new Error("Something went wrong");
         }
       })
-
       .then((data) => {
         var tab = "<br>";
         console.log(data);
@@ -331,7 +261,6 @@ export default {
   },
 };
 </script>
-
 
 
 <style>
