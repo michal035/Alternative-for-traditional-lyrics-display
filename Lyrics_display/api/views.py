@@ -127,7 +127,6 @@ def re_qr(request, token):
 @api_view(['POST'])
 @csrf_exempt
 def Create_new_doc(request):
-
     if (authorization_header := request.META.get('HTTP_AUTHORIZATION')):
         res = barer_token_verification(authorization_header)
 
@@ -156,7 +155,7 @@ def Create_new_doc(request):
             return JsonResponse(data={"token": token_}, status=200, safe=False)
             
         else:
-            return HttpResponse(res[0]["message"], status=int(res[1]))
+            return JsonResponse(data={"message": (res[0]["message"])}, status=int(res[1]), safe=False)
     else:
         return HttpResponse("Authorization header not present", status=401)
 

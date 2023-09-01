@@ -103,7 +103,7 @@ export default {
 
     ShowInfo() {
       //temp cookie set up
-      document.cookie = `bearerToken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im5ld191c2VybmFtZTMiLCJleHAiOjE2OTM0NjQ3NzJ9.4dTKczpsFmFbRW9H1_exIIvyj0DNTr5wi1jpq2yS1Fo; path=/;`;
+      document.cookie = `bearerToken=seyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im5ld191c2VybmFtZTMiLCJleHAiOjE2OTM1ODcxMTB9.jPeh6YmuhTgJd-k6oU6SdYQ21mvx4WoSeOJGoMqKBWU; path=/;`;
 
         if (document.cookie){
         const cookie = this.getCookie("bearerToken");
@@ -117,7 +117,7 @@ export default {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${cookie}`,
+            "Authorization": `Bearer ${cookie}`,
           },
           body: JSON.stringify(data),
         };
@@ -125,13 +125,18 @@ export default {
         fetch("http://127.0.0.1:8000/create-new", requestOptions)
           .then((response) => response.json())
           .then((data) => {
-            console.log(data.token);
-            this.GetQR(data.token);
+            if(data.message){
+              console.log(data);
+              this.showModal_login = true;
+            }
+            else{
+              this.GetQR(data.token);
+              }
           });
         }
         //login page 
         else{
-          
+            this.showModal_login = true;
         }
     },
     SetPasswd() {
@@ -217,6 +222,9 @@ export default {
       window.location.href = "/" + this.token;
       this.GetQR_settings(this.token);
     },
+    createNewUser(){
+      console.log("New user created")
+    }
   },
   mounted() {
     const path = window.location.pathname;
@@ -263,6 +271,8 @@ export default {
 </script>
 
 
+<!-- This needs to be moved-->
+
 <style>
 .modal-content {
   background: transparent;
@@ -280,6 +290,30 @@ export default {
 .modal-body {
   padding: 0;
 }
+
+#main_page {
+    width: 100%;
+    max-width: 500px;
+}
+
+#the_content_part {
+    padding: 20px;
+    margin: 0 auto;
+}
+
+input.form-control,
+button {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.outline_{
+  border: 5px solid rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+  
+}
+
 </style>
 
 
@@ -308,16 +342,23 @@ export default {
 
         <!-- Log in modal-->
         <Modal v-if="showModal_login">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" id="main_page" style="background: transparent; width: 50%">
-                <div class="modal-content" style="background: transparent;" id="the_content_part" >
-                    
-
-                    <div class=" d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="width:100%" >
+                <div class="modal-content" id="the_content_part" style="width:100%">
+                    <div class="d-flex justify-content-center mt-4 col-md-6" style="width:100%">
+                        <div>
+                            <input class="form-control outline-danger outline_" placeholder="Type in the email" type="text" id="email">
+                            <br>
+                            <input class="form-control outline-danger outline_" placeholder="Type in the password" type="password" id="passwd">
+                            <br>
+                            <input class="form-control outline-danger outline_" placeholder="Retype in the password" type="password" id="passwd">
+                            <br>
+                            <button class="btn btn-dark btn-lg px-4  " @click="createNewUser">Submit</button>
+                        </div>
                     </div>
                 </div>
-                    
-            </div>     
+            </div>
         </Modal>
+
 
 
         <!-- Final pop up after the creation 
