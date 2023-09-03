@@ -21,8 +21,7 @@ export default {
       token: "",
       doc_url: "",
       email: "",
-      //This is just for sake of validing data on cliclet side while creating new account -
-      // this is not a securting risk althow it might look like one
+      //This is just for sake of validing data on client side while creating new account 
       passwdTemp: null,
       passwdTempRe: null,
     };
@@ -321,50 +320,6 @@ export default {
   },
 };
 </script>
-
-
-<!-- This needs to be moved-->
-
-<style>
-.modal-content {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  align-items: center;
-  justify-items: center;
-}
-
-.modal-dialog {
-  margin: 0;
-  max-width: none;
-}
-
-.modal-body {
-  padding: 0;
-}
-
-#main_page {
-  width: 100%;
-  max-width: 500px;
-}
-
-#the_content_part {
-  padding: 20px;
-  margin: 0 auto;
-}
-
-input.form-control,
-button {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.outline_ {
-  border: 5px solid rgba(0, 0, 0, 0.3);
-  padding: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-}
-</style>
 
 
 <template>

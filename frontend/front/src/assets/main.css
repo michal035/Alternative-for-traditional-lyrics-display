@@ -1,5 +1,46 @@
 @import './base.css';
 
+.modal-content {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  align-items: center;
+  justify-items: center;
+}
+
+.modal-dialog {
+  margin: 0;
+  max-width: none;
+}
+
+.modal-body {
+  padding: 0;
+}
+
+#main_page {
+  width: 100%;
+  max-width: 500px;
+}
+
+#the_content_part {
+  padding: 20px;
+  margin: 0 auto;
+}
+
+input.form-control,
+button {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.outline_ {
+  border: 5px solid rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+}
+
+
+
 .settings-button {
   position: fixed;
   top: 20px;
@@ -26,3 +67,5 @@
 flex-direction: column;
 align-items: center;
 }
+
+
