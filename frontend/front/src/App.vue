@@ -15,11 +15,16 @@ export default {
       showmodal_join_via_code: false,
       showmodal_create_code: false,
       showModal_set_code: false,
-      showModal_login: false,
+      showModalCreateNewUser: false,
       showPasswdDiv: false,
       imgUrl: "",
       token: "",
       doc_url: "",
+      email: "",
+      //This is just for sake of validing data on cliclet side while creating new account -
+      // this is not a securting risk althow it might look like one
+      passwdTemp: null,
+      passwdTempRe: null,
     };
   },
 
@@ -30,12 +35,6 @@ export default {
   },
 
   methods: {
-    send(file, the_code_r) {
-      // Your send method code here
-    },
-    send_just_code(code_) {
-      // Your send_just_code method code here
-    },
     validate() {
       var doc = document.querySelector('input[type="file"]');
       var the_code_r = document.getElementById("the_code_r").value;
@@ -94,20 +93,19 @@ export default {
         .catch((err) => console.log(err));
     },
 
-     getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-      },
-    
+    getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+    },
 
     ShowInfo() {
       //temp cookie set up
       document.cookie = `bearerToken=seyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im5ld191c2VybmFtZTMiLCJleHAiOjE2OTM1ODcxMTB9.jPeh6YmuhTgJd-k6oU6SdYQ21mvx4WoSeOJGoMqKBWU; path=/;`;
 
-        if (document.cookie){
+      if (document.cookie) {
         const cookie = this.getCookie("bearerToken");
-        
+
         console.log(cookie);
         this.showModal_main = false;
 
@@ -117,7 +115,7 @@ export default {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${cookie}`,
+            Authorization: `Bearer ${cookie}`,
           },
           body: JSON.stringify(data),
         };
@@ -125,19 +123,19 @@ export default {
         fetch("http://127.0.0.1:8000/create-new", requestOptions)
           .then((response) => response.json())
           .then((data) => {
-            if(data.message){
+            if (data.message) {
               console.log(data);
-              this.showModal_login = true;
-            }
-            else{
+              this.showModalCreateNewUser = true;
+            } else {
               this.GetQR(data.token);
-              }
+            }
           });
-        }
-        //login page 
-        else{
-            this.showModal_login = true;
-        }
+      }
+      //login page
+      else {
+        // needs to be redictred to real login page
+        //this.showModalCreateNewUser = true;
+      }
     },
     SetPasswd() {
       let p_value = document.getElementById("the_passwd").value;
@@ -222,9 +220,63 @@ export default {
       window.location.href = "/" + this.token;
       this.GetQR_settings(this.token);
     },
-    createNewUser(){
-      console.log("New user created")
-    }
+    createNewUser() {
+      const passwd = this.passwdTemp;
+      if (passwd) {
+        if (passwd != this.passwdTempRe) {
+          console.log("passwords do not match");
+          document.getElementById("error-message").innerHTML =
+            "Passwords do not match";
+        } else {
+          let regex = /@.*\./;
+          if (!regex.test(this.email)) {
+            document.getElementById("error-message").innerHTML =
+              "Invalid email";
+          } else {
+            // There is HTTPS connection, but still I don't want for the actual password to leave to client
+            const encoder = new TextEncoder();
+            const data = encoder.encode(passwd);
+
+            crypto.subtle
+              .digest("SHA-256", data)
+              .then((hashBuffer) => {
+                var hashArray = Array.from(new Uint8Array(hashBuffer));
+                var hashHex = hashArray
+                  .map((byte) => byte.toString(16).padStart(2, "0"))
+                  .join("");
+
+                var data = {
+                  username: this.email,
+                  password: hashHex,
+                };
+
+                const requestOptions = {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(data),
+                };
+
+                fetch(
+                  "http://127.0.0.1:8000/create-account",
+                  requestOptions
+                ).then((response) => {
+                  this.showModalCreateNewUser = false;
+                  return response;
+                });
+              })
+              .catch((error) => {
+                console.error("Error", error);
+                console.log(response);
+              });
+          }
+        }
+      } else {
+        document.getElementById("error-message").innerHTML =
+          "Password is required";
+      }
+    },
   },
   mounted() {
     const path = window.location.pathname;
@@ -292,28 +344,26 @@ export default {
 }
 
 #main_page {
-    width: 100%;
-    max-width: 500px;
+  width: 100%;
+  max-width: 500px;
 }
 
 #the_content_part {
-    padding: 20px;
-    margin: 0 auto;
+  padding: 20px;
+  margin: 0 auto;
 }
 
 input.form-control,
 button {
-    width: 100%;
-    margin-bottom: 10px;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
-.outline_{
+.outline_ {
   border: 5px solid rgba(0, 0, 0, 0.3);
   padding: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-  
 }
-
 </style>
 
 
@@ -341,21 +391,25 @@ button {
 
 
         <!-- Log in modal-->
-        <Modal v-if="showModal_login">
+        <Modal v-if="showModalCreateNewUser">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="width:100%" >
                 <div class="modal-content" id="the_content_part" style="width:100%">
                     <div class="d-flex justify-content-center mt-4 col-md-6" style="width:100%">
                         <div>
-                            <input class="form-control outline-danger outline_" placeholder="Type in the email" type="text" id="email">
+                            <input v-model="email" class="form-control outline-danger outline_" placeholder="Type in the email" type="text" id="email">
                             <br>
-                            <input class="form-control outline-danger outline_" placeholder="Type in the password" type="password" id="passwd">
+                            <input v-model="passwdTemp" class="form-control outline-danger outline_" placeholder="Type in the password" type="password" id="passwd">
                             <br>
-                            <input class="form-control outline-danger outline_" placeholder="Retype in the password" type="password" id="passwd">
+                            <input v-model="passwdTempRe"  class="form-control outline-danger outline_" placeholder="Retype in the password" type="password" id="passwd">
                             <br>
                             <button class="btn btn-dark btn-lg px-4  " @click="createNewUser">Submit</button>
                         </div>
+                          
                     </div>
+                    <br>
+                    <p id="error-message"></p>
                 </div>
+                
             </div>
         </Modal>
 

@@ -198,11 +198,12 @@ def create_new_account(request):
     username_ = data.get("username")
     password = data.get("password")
 
-    if (not User.filter(username=username_)):
+    if (not User.objects.filter(username=username_)):
         new_record = User(username=username_, passwd=password)
         new_record.save()
+        return HttpResponse("User has beeen created", status=201)
     else:
-        return HttpResponse("User already exists", status=409)
+        return HttpResponse("This email already has been registered", status=409)
 
 
 def non(request):
