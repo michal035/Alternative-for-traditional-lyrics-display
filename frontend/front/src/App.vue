@@ -17,11 +17,12 @@ export default {
       showModal_set_code: false,
       showModalCreateNewUser: false,
       showPasswdDiv: false,
-      imgUrl: "",
-      token: "",
-      doc_url: "",
-      email: "",
-      //This is just for sake of validing data on client side while creating new account 
+      showModalLogin: false,
+      imgUrl: null,
+      token: null,
+      doc_url: null,
+      email: null,
+      //This is just for sake of validing data on client side while creating new account
       passwdTemp: null,
       passwdTempRe: null,
     };
@@ -345,7 +346,7 @@ export default {
 
 
 
-        <!-- Log in modal-->
+        <!-- Create account in modal-->
         <Modal v-if="showModalCreateNewUser">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="width:100%" >
                 <div class="modal-content" id="the_content_part" style="width:100%">
@@ -368,6 +369,27 @@ export default {
             </div>
         </Modal>
 
+
+
+        <!-- Login account in modal-->
+        <Modal v-if="showModalLogin">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="width:100%" >
+                <div class="modal-content" id="the_content_part" style="width:100%">
+                    <div class="d-flex justify-content-center mt-4 col-md-6" style="width:100%">
+                        <div>
+                            <input v-model="email" class="form-control outline-danger outline_" placeholder="Type in the email" type="text" id="email">
+                            <br>
+                            <input v-model="passwdTemp" class="form-control outline-danger outline_" placeholder="Type in the password" type="password" id="passwd">
+                            <br>
+                            <button class="btn btn-dark btn-lg px-4  " @click="createNewUser">Login</button>
+                        </div>
+                    </div>
+                    <br>
+                    <p id="error-message"></p>
+                </div>
+                
+            </div>
+        </Modal>
 
 
         <!-- Final pop up after the creation 
@@ -437,8 +459,6 @@ export default {
                 </div>
                     
             </div>
-
-
 
         </Modal>
 
