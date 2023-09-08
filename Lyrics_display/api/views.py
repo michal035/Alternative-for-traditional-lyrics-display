@@ -59,12 +59,12 @@ def login(request):
             token = jwt.encode(
                 token_payload, secret_key, algorithm="HS256")
 
-            print(token)
             return JsonResponse(data={"token": (str(token)[2:])[:-1], "username": username_}, status=200)
         else:
             return HttpResponse("Wrong credentials", status=401)
-    except:
+    except Exception as e:
         # This needs to be logged
+        print(f"exception {e}")
         return HttpResponse("Wrong credentials", status=401)
 
 
@@ -104,7 +104,7 @@ def upload_file(request, token_):
 
 
 @api_view(['GET'])
-def re_qr(request, token):
+def get_qr(request, token):
 
     if (authorization_header := request.META.get('HTTP_AUTHORIZATION')):
         res = barer_token_verification(authorization_header)
@@ -130,19 +130,19 @@ def Create_new_doc(request):
     if (authorization_header := request.META.get('HTTP_AUTHORIZATION')):
         res = barer_token_verification(authorization_header)
 
-        # Generating a token with a fixed number of characters - 20 should work just fine
-        characters = string.ascii_letters + string.digits
-        token_ = ''.join(random.choice(characters) for _ in range(20))
-
         if ((res := tuple(res))[0] == 200):
             username_ = (tuple(res))[1]
             user_obj = User.objects.get(username=username_)
+            
+            # Generating a token with a fixed number of characters - 20 should work just fine
+            characters = string.ascii_letters + string.digits
+            token_ = ''.join(random.choice(characters) for _ in range(20))
 
             if (not (the_doc := Doc.objects.filter(token=token_))):
                 new_record = Doc(token=token_, user=user_obj)
                 new_record.save()
-
-                return JsonResponse( data="Resource successfully created", status=201, safe=False)
+                
+                return JsonResponse(data={"token": token_}, status=201, safe=False)
             else:
                 JsonResponse(
                     data={"message": "Resource not found"}, status=404, safe=False)
@@ -152,9 +152,8 @@ def Create_new_doc(request):
             # image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token_}.jpg"
             # image_file = open(image_path, 'rb')
 
-            return JsonResponse(data={"token": token_}, status=200, safe=False)
-            
         else:
+            # Further investigation needed
             return JsonResponse(data={"message": (res[0]["message"])}, status=int(res[1]), safe=False)
     else:
         return HttpResponse("Authorization header not present", status=401)
