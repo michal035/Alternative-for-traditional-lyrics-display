@@ -18,9 +18,9 @@ export default {
       showModalCreateNewUser: false,
       showPasswdDiv: false,
       showModalLogin: false,
-      imgUrl: null,
-      token: null,
-      doc_url: null,
+      imgUrl: "",
+      token: "",
+      doc_url: "",
       email: null,
       //This is just for sake of validing data on client side while creating new account
       passwdTemp: null,
@@ -101,7 +101,7 @@ export default {
 
     ShowInfo() {
       //temp cookie set up
-      document.cookie = `bearerToken=seyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im5ld191c2VybmFtZTMiLCJleHAiOjE2OTM1ODcxMTB9.jPeh6YmuhTgJd-k6oU6SdYQ21mvx4WoSeOJGoMqKBWU; path=/;`;
+      //document.cookie = `bearerToken=seyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im5ld191c2VybmFtZTMiLCJleHAiOjE2OTM1ODcxMTB9.jPeh6YmuhTgJd-k6oU6SdYQ21mvx4WoSeOJGoMqKBWU; path=/;`;
 
       if (document.cookie) {
         const cookie = this.getCookie("bearerToken");
@@ -130,11 +130,9 @@ export default {
               this.GetQR(data.token);
             }
           });
-      }
-      //login page
+      } 
       else {
-        // needs to be redictred to real login page
-        //this.showModalCreateNewUser = true;
+        this.showModalLogin = true;
       }
     },
     SetPasswd() {
@@ -219,6 +217,57 @@ export default {
       this.doc_url = "/" + this.token;
       window.location.href = "/" + this.token;
       this.GetQR_settings(this.token);
+    },
+
+    // validations needs to be moved to seperate functon - login/create use to same part
+    login() {
+      const passwd = this.passwdTemp;
+      if (passwd) {
+        let regex = /@.*\./;
+        if (!regex.test(this.email)) {
+          document.getElementById("error-message").innerHTML = "Invalid email";
+        } else {
+          // There is HTTPS connection, but still I don't want for the actual password to leave to client
+          const encoder = new TextEncoder();
+          const data = encoder.encode(passwd);
+
+          crypto.subtle
+            .digest("SHA-256", data)
+            .then((hashBuffer) => {
+              var hashArray = Array.from(new Uint8Array(hashBuffer));
+              var hashHex = hashArray
+                .map((byte) => byte.toString(16).padStart(2, "0"))
+                .join("");
+
+              var data = {
+                username: this.email,
+                password: hashHex,
+              };
+
+              const requestOptions = {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+              };
+
+              fetch("http://127.0.0.1:8000/login", requestOptions).then(
+                (response) => {
+                  this.showModalCreateNewUser = false;
+                  return response;
+                }
+              );
+            })
+            .catch((error) => {
+              console.error("Error", error);
+              console.log(response);
+            });
+        }
+      } else {
+        document.getElementById("error-message").innerHTML =
+          "Password is required";
+      }
     },
     createNewUser() {
       const passwd = this.passwdTemp;
@@ -381,7 +430,7 @@ export default {
                             <br>
                             <input v-model="passwdTemp" class="form-control outline-danger outline_" placeholder="Type in the password" type="password" id="passwd">
                             <br>
-                            <button class="btn btn-dark btn-lg px-4  " @click="createNewUser">Login</button>
+                            <button class="btn btn-dark btn-lg px-4  " @click="login">Login</button>
                         </div>
                     </div>
                     <br>
