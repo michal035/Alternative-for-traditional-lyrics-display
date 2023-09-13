@@ -77,9 +77,20 @@ export default {
       }
     },
     GetQR(token_) {
-      var data = { token: token_ };
+      const data = { token: token_ };
+      const cookie = this.getCookie("bearerToken");
 
-      fetch("http://127.0.0.1:8000/" + token_ + "/qr")
+
+      const requestOptions = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookie}`,
+          },
+          //body: JSON.stringify(data),
+        };
+
+      fetch("http://127.0.0.1:8000/" + token_ + "/qr", requestOptions)
         .then((response) => response.blob())
         .then((blob) => {
           var imgUrl = URL.createObjectURL(blob);
@@ -87,6 +98,7 @@ export default {
           this.token = data.token;
           this.imgUrl = imgUrl;
 
+          // outsorce to function
           this.showmodal_create_code = false;
           this.showModal_final = true;
         })
@@ -100,9 +112,6 @@ export default {
     },
 
     ShowInfo() {
-      //temp cookie set up
-      //document.cookie = `bearerToken=seyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im5ld191c2VybmFtZTMiLCJleHAiOjE2OTM1ODcxMTB9.jPeh6YmuhTgJd-k6oU6SdYQ21mvx4WoSeOJGoMqKBWU; path=/;`;
-
       if (document.cookie) {
         const cookie = this.getCookie("bearerToken");
 
@@ -130,8 +139,7 @@ export default {
               this.GetQR(data.token);
             }
           });
-      } 
-      else {
+      } else {
         this.showModalLogin = true;
       }
     },
@@ -253,10 +261,12 @@ export default {
               };
 
               fetch("http://127.0.0.1:8000/login", requestOptions).then(
-                (response) => {
-                  this.showModalCreateNewUser = false;
-                  return response;
-                }
+                ((serverPromise) =>
+                  serverPromise.json()
+                .then((j) => {document.cookie = `bearerToken=${j.token}`
+                 this.CloseModal("showModalLogin")})
+                .catch((e) => console.log(e))
+              )
               );
             })
             .catch((error) => {
@@ -449,7 +459,7 @@ export default {
                 
                 <div class="modal-body d-flex flex-column align-items-center background: transparent; width: 50%" style="width: 100%">
                             <br>
-                            
+                            <!--Needs to be done the right way-->
                             <p style="text-align: center; color: white;">Here is the code: <h3>{{ this.token }}</h3></p>
                            
                             <br>

@@ -139,6 +139,8 @@ def Create_new_doc(request):
             token_ = ''.join(random.choice(characters) for _ in range(20))
 
             if (not (the_doc := Doc.objects.filter(token=token_))):
+
+                generate_qr_code.generate_qr(token_)
                 new_record = Doc(token=token_, user=user_obj)
                 new_record.save()
                 
@@ -146,8 +148,6 @@ def Create_new_doc(request):
             else:
                 JsonResponse(
                     data={"message": "Resource not found"}, status=404, safe=False)
-
-            generate_qr_code.generate_qr(token_)
 
             # image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token_}.jpg"
             # image_file = open(image_path, 'rb')
