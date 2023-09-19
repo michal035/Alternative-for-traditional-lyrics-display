@@ -395,8 +395,8 @@ export default {
                     
 
                     <div class=" d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%; margin: 20px;" @click="ShowInfo">Create new</button>
-                        <button class="btn btn-dark btn-lg px-4 " style="width: 45%; margin: 20px;" @click="OpenModal('showmodal_join_via_code','showModal_main')">Join via code</button>
+                        <button class="btn btn-dark btn-lg px-4 custom-btn " style="width: 45%; margin: 20px;" @click="ShowInfo">Create new</button>
+                        <button class="btn btn-dark btn-lg px-4 custom-btn " style="width: 45%; margin: 20px;" @click="OpenModal('showmodal_join_via_code','showModal_main')">Join via code</button>
                     </div>
                 </div>
                     
@@ -411,7 +411,7 @@ export default {
                 <div class="modal-content" id="the_content_part" style="width:100%">
                     <div class="d-flex justify-content-center mt-4 col-md-6" style="width:100%">
                         <div>
-                            <input v-model="email" class="form-control outline-danger outline_" placeholder="Type in the email" type="text" id="email">
+                            <input v-model="email" class="form-control outline-danger outline_ custom-input" placeholder="Type in the email" type="text" id="email">
                             <br>
                             <input v-model="passwdTemp" class="form-control outline-danger outline_" placeholder="Type in the password" type="password" id="passwd">
                             <br>
@@ -436,11 +436,11 @@ export default {
                 <div class="modal-content" id="the_content_part" style="width:100%">
                     <div class="d-flex justify-content-center mt-4 col-md-6" style="width:100%">
                         <div>
-                            <input v-model="email" class="form-control outline-danger outline_" placeholder="Type in the email" type="text" id="email">
+                            <input v-model="email" class="form-control outline-danger outline_ " placeholder="Type in the email" type="text" id="email">
                             <br>
                             <input v-model="passwdTemp" class="form-control outline-danger outline_" placeholder="Type in the password" type="password" id="passwd">
                             <br>
-                            <button class="btn btn-dark btn-lg px-4  " @click="login">Login</button>
+                            <button class="btn btn-dark btn-lg px-4 login-btn " @click="login">Login</button>
                         </div>
                     </div>
                     <br>
