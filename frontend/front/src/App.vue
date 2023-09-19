@@ -181,12 +181,23 @@ export default {
     },
     notFound() {
       var the_doc = document.getElementById("main");
-      the_doc.innerHTML = `<br> <h3>No document associated with this token</h3>`;
+      the_doc.innerHTML = `<br> <h3 id="no_token">No document associated with this token</h3>`;
     },
     GetQR_settings(token_) {
-      var data = { token: token_ };
+      
+      const data = { token: token_ };
+      const cookie = this.getCookie("bearerToken");
 
-      fetch("http://127.0.0.1:8000/" + token_ + "/qr")
+      const requestOptions = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookie}`,
+          },
+          //body: JSON.stringify(data),
+        };
+
+      fetch("http://127.0.0.1:8000/" + token_ + "/qr", requestOptions)
         .then((response) => response.blob())
         .then((blob) => {
           var imgUrl = URL.createObjectURL(blob);
@@ -207,17 +218,6 @@ export default {
           "Content-Type": "application/json",
         },
       };
-
-      fetch("http://127.0.0.1:8000/" + token + "/check")
-        .then((serverPromise) => serverPromise.json())
-        .then((j) => {
-          if (j[0]["passwd"] == true) {
-            this.showPasswdDiv = true;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
 
       this.GetQR_settings(token);
     },
