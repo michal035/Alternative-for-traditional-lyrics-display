@@ -69,14 +69,14 @@ button {
   align-items: center;
 }
 
-/* Needs to be adjusted*/
+
 #no_token {
   font-size: 24px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
   color: #333;
 }
 
 
-/* */
 .custom-input {
   border: 2px solid #f00;
   border-radius: 8px;
@@ -105,13 +105,28 @@ button {
 }
 
 
+.login-input-outline {
+  padding: 10px;
+  box-shadow: 0 0 15px rgb(168, 165, 165);
+}
+
 
 .login-btn{
-  background-color: #554545;
-  color: #fff;
-  border: none;
-  box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.2);
+
+  border-radius: 0.5rem;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: #fdfbfb;
+  color: #333;
+  box-shadow: 0 0 15px rgb(168, 165, 165);
   transition: box-shadow 0.3s ease;
+}
+
+
+
+.login-btn:hover {
+  background-color: #333;
+  box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.3);
 }
 
 

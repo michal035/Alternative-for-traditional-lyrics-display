@@ -37,7 +37,7 @@ export default {
   methods: {
     validate() {
       var doc = document.querySelector('input[type="file"]');
-      var the_code_r = document.getElementById("the_code_r").value;
+      //var the_code_r = document.getElementById("the_code_r").value;
       var file = doc.files[0];
       let extension = doc.value.split(".")[doc.value.split(".").length - 1];
 
@@ -48,7 +48,7 @@ export default {
         if (f_size > 500) {
           console.log("file is too big!");
         }
-        this.send(file, the_code_r);
+        this.send(file);
       } else {
         if (the_code_r != "") {
           console.log(the_code_r);
@@ -181,7 +181,7 @@ export default {
     },
     notFound() {
       var the_doc = document.getElementById("main");
-      the_doc.innerHTML = `<br> <h3 id="no_token">No document associated with this token</h3>`;
+      the_doc.innerHTML = `<br><h3 id="no_token">No document associated with this token</h3><br><p>Contact the document owner or create your own document.</p>`;
     },
     GetQR_settings(token_) {
       
@@ -436,9 +436,9 @@ export default {
                 <div class="modal-content" id="the_content_part" style="width:100%">
                     <div class="d-flex justify-content-center mt-4 col-md-6" style="width:100%">
                         <div>
-                            <input v-model="email" class="form-control outline-danger outline_ " placeholder="Type in the email" type="text" id="email">
+                            <input v-model="email" class="form-control outline-danger login-input-outline " placeholder="Type in the email" type="text" id="email">
                             <br>
-                            <input v-model="passwdTemp" class="form-control outline-danger outline_" placeholder="Type in the password" type="password" id="passwd">
+                            <input v-model="passwdTemp" class="form-control outline-danger login-input-outline" placeholder="Type in the password" type="password" id="passwd">
                             <br>
                             <button class="btn btn-dark btn-lg px-4 login-btn " @click="login">Login</button>
                         </div>
