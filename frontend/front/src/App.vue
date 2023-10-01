@@ -22,7 +22,7 @@ export default {
       token: "",
       doc_url: "",
       email: null,
-      //This is just for sake of validing data on client side while creating new account
+      //This is just for sake of validing data on client side while creating new account - sha256
       passwdTemp: null,
       passwdTempRe: null,
     };
@@ -37,23 +37,19 @@ export default {
   methods: {
     validate() {
       var doc = document.querySelector('input[type="file"]');
-      //var the_code_r = document.getElementById("the_code_r").value;
       var file = doc.files[0];
       let extension = doc.value.split(".")[doc.value.split(".").length - 1];
 
-      console.log(the_code_r);
+
       if (extension == "doc" || extension == "docx") {
         let f_size = file.size;
         f_size = f_size / 1000 / 1000;
         if (f_size > 500) {
           console.log("file is too big!");
         }
-        this.send(file);
+        this.setDoc(file);
       } else {
-        if (the_code_r != "") {
-          console.log(the_code_r);
-          this.send_just_code(the_code_r);
-        }
+        
         console.log("Unaccepted file type");
       }
     },
@@ -134,7 +130,10 @@ export default {
           .then((data) => {
             if (data.message) {
               console.log(data);
-              this.showModalCreateNewUser = true;
+              //This needs to be fixed 
+              //this.showModalCreateNewUser = true;
+
+              this.showModalLogin = true;
             } else {
               this.GetQR(data.token);
             }
@@ -183,6 +182,28 @@ export default {
       var the_doc = document.getElementById("main");
       the_doc.innerHTML = `<br><h3 id="no_token">No document associated with this token</h3><br><p>Contact the document owner or create your own document.</p>`;
     },
+    setDoc(file) {
+      
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const data = { token: this.token };
+      const cookie = this.getCookie("bearerToken");
+
+      const requestOptions = {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${cookie}`,
+          },
+          body: formData
+        };
+      
+      fetch("http://127.0.0.1:8000/upload/" + this.token +"/", requestOptions)
+        .then((response) => console.log(response.json()))
+        .catch((err) => console.log(err));
+    },
+
+
     GetQR_settings(token_) {
       
       const data = { token: token_ };
@@ -264,7 +285,13 @@ export default {
                 ((serverPromise) =>
                   serverPromise.json()
                 .then((j) => {document.cookie = `bearerToken=${j.token}`
-                 this.CloseModal("showModalLogin")})
+                 
+                 //here to be teasted
+                 //this.CloseModal("showModalLogin");
+                 this.showModalLogin = false;
+                 // After login you should be redirected to created doc 
+                  this.ShowInfo();                
+                 })
                 .catch((e) => console.log(e))
               )
               );
@@ -356,7 +383,7 @@ export default {
         }
       })
       .then((data) => {
-        var tab = "<br>";
+        var tab = "<br><div id='con'>";
         console.log(data);
 
         console.log(data[2]["paragraph"]);
@@ -370,7 +397,8 @@ export default {
           }
         }
 
-        console.log(tab);
+        tab += "</div>"
+        //console.log(tab);
         var the_doc = document.getElementById("main");
         the_doc.innerHTML = tab;
       })
@@ -436,9 +464,10 @@ export default {
                 <div class="modal-content" id="the_content_part" style="width:100%">
                     <div class="d-flex justify-content-center mt-4 col-md-6" style="width:100%">
                         <div>
-                            <input v-model="email" class="form-control outline-danger login-input-outline " placeholder="Type in the email" type="text" id="email">
+                            <!-- Further styling is needed-->
+                            <input v-model="email" class="form-control outline-danger login-input-outline  outline_" placeholder="Type in the email" type="text" id="email">
                             <br>
-                            <input v-model="passwdTemp" class="form-control outline-danger login-input-outline" placeholder="Type in the password" type="password" id="passwd">
+                            <input v-model="passwdTemp" class="form-control outline-danger login-input-outline outline_" placeholder="Type in the password" type="password" id="passwd">
                             <br>
                             <button class="btn btn-dark btn-lg px-4 login-btn " @click="login">Login</button>
                         </div>

@@ -154,7 +154,11 @@ def Create_new_doc(request):
 
         else:
             # Further investigation needed
-            return JsonResponse(data={"message": (res[0]["message"])}, status=int(res[1]), safe=False)
+            try:
+                return JsonResponse(data={"message": (res[0]["message"])}, status=int(res[1]), safe=False)
+            except:
+                #Needs to be logged - this should not be happening 
+                return JsonResponse(data={"message": (res)}, status=int(res[1]), safe=False)
     else:
         return HttpResponse("Authorization header not present", status=401)
 
