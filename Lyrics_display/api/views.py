@@ -65,13 +65,13 @@ def login(request):
     except Exception as e:
         # This needs to be logged
         print(f"exception {e}")
-        return HttpResponse("Wrong credentials", status=401)
+        return JsonResponse({'error':"Invalid credentials"}, status=401)
 
 
 @api_view(['POST'])
 @csrf_exempt
 def upload_file(request, token_):
-
+    print("yasss")
     if (authorization_header := request.META.get('HTTP_AUTHORIZATION')):
         res = barer_token_verification(authorization_header)
 
@@ -106,22 +106,15 @@ def upload_file(request, token_):
 @api_view(['GET'])
 def get_qr(request, token):
 
-    if (authorization_header := request.META.get('HTTP_AUTHORIZATION')):
-        res = barer_token_verification(authorization_header)
-        if ((res := tuple(res))[0] == 200):
-            image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token}.jpg"
-            if not os.path.exists(image_path):
-                return HttpResponse("QR code not found ", status=404)
-            image_file = open(image_path, 'rb')
+    image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token}.jpg"
+    if not os.path.exists(image_path):
+        return HttpResponse("QR code not found ", status=404)
+    image_file = open(image_path, 'rb')
 
-            response = FileResponse(
-                image_file, content_type='image/jpeg', status=200)
+    response = FileResponse(
+        image_file, content_type='image/jpeg', status=200)
 
-            return response
-        else:
-            return HttpResponse(res[0]["message"], status=int(res[1]))
-    else:
-        return HttpResponse("Authorization header not present", status=401)
+    return response
 
 
 @api_view(['POST'])
