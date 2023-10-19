@@ -45,12 +45,12 @@ export default {
         let f_size = file.size;
         f_size = f_size / 1000 / 1000;
         if (f_size > 500) {
-          console.log("file is too big!");
+          console.error("file is too big!");
         }
         this.setDoc(file);
       } else {
         
-        console.log("Unaccepted file type");
+        console.error("Unaccepted file type");
       }
     },
     RedirectToPage_from_join_modal() {
@@ -94,11 +94,11 @@ export default {
           this.token = data.token;
           this.imgUrl = imgUrl;
 
-          // outsorce to function
+          // outsource to function
           this.showmodal_create_code = false;
           this.showModal_final = true;
         })
-        .catch((err) => console.log(err));
+        .catch((error) => console.error(error));
     },
 
     getCookie(name) {
@@ -139,49 +139,24 @@ export default {
             }
           });
       } else {
+        console.error("Cookie not found")
         this.showModalLogin = true;
       }
-    },
-    SetPasswd() {
-      let p_value = document.getElementById("the_passwd").value;
-
-      const encoder = new TextEncoder();
-      const data = encoder.encode(p_value);
-
-      crypto.subtle
-        .digest("SHA-256", data)
-        .then((hashBuffer) => {
-          var hashArray = Array.from(new Uint8Array(hashBuffer));
-          var hashHex = hashArray
-            .map((byte) => byte.toString(16).padStart(2, "0"))
-            .join("");
-
-          var data = { code: hashHex };
-
-          const requestOptions = {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          };
-
-          fetch(
-            "http://127.0.0.1:8000/" + this.token + "/set",
-            requestOptions
-          ).then((response) => {
-            this.showmodal_create_code = false;
-            return response;
-          });
-        })
-        .catch((error) => {
-          console.error("Error", error);
-        });
     },
     notFound() {
       var the_doc = document.getElementById("main");
       the_doc.innerHTML = `<br><h3 id="no_token">No document associated with this token</h3><br><p>Contact the document owner or create your own document.</p>`;
     },
+    unauthorizedFileChange() {
+      var the_doc = document.getElementById("main");
+      the_doc.innerHTML = `<br><h3 id="no_token">You do not have permission to modify this file</h3><br><p>Contact the document owner or create your own document.</p>`;
+    
+      setTimeout(() => {
+        this.RedirectToPage(); 
+      }, 3000);
+        
+    },
+
     setDoc(file) {
       
       const formData = new FormData();
@@ -198,9 +173,23 @@ export default {
           body: formData
         };
       
-      fetch("http://127.0.0.1:8000/upload/" + this.token +"/", requestOptions)
-        .then((response) => console.log(response.json()))
-        .catch((err) => console.log(err));
+      fetch("http://127.0.0.1:8000/upload/" + this.token + "/", requestOptions)
+      .then(response => {
+          if(response.ok){
+              return response.json();
+          }
+          throw new Error('Network response was not ok.');
+      })
+      .then(data => {
+          console.log(data); 
+          this.RedirectToPage(); 
+      })
+      .catch(err => {
+          console.error('Lack of perimissions', err);
+          this.showModal = false;
+          this.unauthorizedFileChange(); 
+      });
+
     },
 
 
@@ -226,7 +215,7 @@ export default {
           this.token = data.token;
           this.imgUrl = imgUrl;
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
     },
     ShowSettings() {
       this.showModal = true;
@@ -287,12 +276,12 @@ export default {
                 .then((j) => {document.cookie = `bearerToken=${j.token}`
                  
                  //here to be teasted
-                 //this.CloseModal("showModalLogin");
-                 this.showModalLogin = false;
+                 this.CloseModal("showModalLogin");
+                 //this.showModalLogin = false;
                  // After login you should be redirected to created doc 
                   this.ShowInfo();                
                  })
-                .catch((e) => console.log(e))
+                .catch((error) => console.error("Error", error))
               )
               );
             })
@@ -310,7 +299,7 @@ export default {
       const passwd = this.passwdTemp;
       if (passwd) {
         if (passwd != this.passwdTempRe) {
-          console.log("passwords do not match");
+          console.error("passwords do not match");
           document.getElementById("error-message").innerHTML =
             "Passwords do not match";
         } else {
@@ -424,7 +413,7 @@ export default {
 
                     <div class=" d-flex justify-content-center mt-4 col-md-6" style="background: transparent; width:100%">
                         <button class="btn btn-dark btn-lg px-4 custom-btn " style="width: 45%; margin: 20px;" @click="ShowInfo">Create new</button>
-                        <button class="btn btn-dark btn-lg px-4 custom-btn " style="width: 45%; margin: 20px;" @click="OpenModal('showmodal_join_via_code','showModal_main')">Join via code</button>
+                        <button class="btn btn-dark btn-lg px-4 custom-btn " style="width: 45%; margin: 20px;" @click="OpenModal('showmodal_join_via_code','showModal_main', true)">Join via code</button>
                     </div>
                 </div>
                     
@@ -465,9 +454,9 @@ export default {
                     <div class="d-flex justify-content-center mt-4 col-md-6" style="width:100%">
                         <div>
                             <!-- Further styling is needed-->
-                            <input v-model="email" class="form-control outline-danger login-input-outline  outline_" placeholder="Type in the email" type="text" id="email">
+                            <input v-model="email" class="form-control outline-danger login-input-outline  outline__" placeholder="Type in the email" type="text" id="email">
                             <br>
-                            <input v-model="passwdTemp" class="form-control outline-danger login-input-outline outline_" placeholder="Type in the password" type="password" id="passwd">
+                            <input v-model="passwdTemp" class="form-control outline-danger login-input-outline outline__" placeholder="Type in the password" type="password" id="passwd">
                             <br>
                             <button class="btn btn-dark btn-lg px-4 login-btn " @click="login">Login</button>
                         </div>

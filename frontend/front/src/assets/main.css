@@ -111,6 +111,18 @@ button {
 }
 
 
+.outline__ {
+  border-radius: 0.5rem;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: #fdfbfb;
+  color: #333;
+  transition: box-shadow 0.3s ease;
+  border: 5px solid rgba(51, 51, 51, 0.3);
+  padding: 10px;
+}
+
+
 .login-btn{
 
   border-radius: 0.5rem;
@@ -118,10 +130,11 @@ button {
   font-size: 1.2rem;
   background-color: #fdfbfb;
   color: #333;
-  box-shadow: 0 0 15px rgb(168, 165, 165);
   transition: box-shadow 0.3s ease;
+  border: 5px solid rgba(51, 51, 51, 0.3);
+  padding: 10px;
+  
 }
-
 
 
 .login-btn:hover {
@@ -132,4 +145,10 @@ button {
 
 #error-message{
   color: white;
+}
+
+
+#con{
+  margin-left: 6%;
+  margin-right: 6%;
 }
