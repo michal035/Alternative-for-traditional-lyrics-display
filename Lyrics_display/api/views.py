@@ -1,39 +1,46 @@
 from django.shortcuts import render
-from rest_framework import viewsets
 from django.http import HttpResponse
 from django.http import HttpResponseNotFound
-from .serializers import ParagraphSerializer
-from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.http import FileResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from . import generate_qr_code
+from dotenv import load_dotenv
 from .models import User, Doc
 import datetime
+import logging
 import jwt
 import string
 import random
 import docx
 import json
 import os
-import base64
 
 
 # All of the paths need to be changed to relative paths
-# Some double checks are unnecessary and in some cases I need to add more - I need to log them as well
 
-# hardcoded just for now
-global secret_key
-secret_key = "tncV0f771WGyvUR9U4LFtHf213NdsjJdas"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_PATH = os.path.join(BASE_DIR, 'logs', 'api.log')
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', filename=LOG_PATH, filemode='a')
+logger = logging.getLogger(__name__)
+
+c_handler = logging.StreamHandler()
+logger.addHandler(c_handler)
+
+
+load_dotenv()
+global SECRET_KEY
+SECRET_KEY = os.getenv("KEY")
 
 
 def barer_token_verification(token):
 
     token = token.replace('Bearer ', '')
     try:
-        decoded_token = jwt.decode(token, secret_key, algorithms=["HS256"])
+        decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         return {decoded_token["username"], 200}
     except jwt.ExpiredSignatureError:
         return ({"message": "Token has expired"}, 401)
@@ -57,21 +64,19 @@ def login(request):
                 "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
             }
             token = jwt.encode(
-                token_payload, secret_key, algorithm="HS256")
+                token_payload, SECRET_KEY, algorithm="HS256")
 
             return JsonResponse(data={"token": (str(token)[2:])[:-1], "username": username_}, status=200)
         else:
             return HttpResponse("Wrong credentials", status=401)
     except Exception as e:
-        # This needs to be logged
-        print(f"exception {e}")
-        return JsonResponse({'error':"Invalid credentials"}, status=401)
+        logger.error("An error occurred: %s", str(e))
+        return JsonResponse({'error': "Invalid credentials"}, status=401)
 
 
 @api_view(['POST'])
 @csrf_exempt
 def upload_file(request, token_):
-    print("yasss")
     if (authorization_header := request.META.get('HTTP_AUTHORIZATION')):
         res = barer_token_verification(authorization_header)
 
@@ -126,7 +131,7 @@ def Create_new_doc(request):
         if ((res := tuple(res))[0] == 200):
             username_ = (tuple(res))[1]
             user_obj = User.objects.get(username=username_)
-            
+
             # Generating a token with a fixed number of characters - 20 should work just fine
             characters = string.ascii_letters + string.digits
             token_ = ''.join(random.choice(characters) for _ in range(20))
@@ -136,21 +141,18 @@ def Create_new_doc(request):
                 generate_qr_code.generate_qr(token_)
                 new_record = Doc(token=token_, user=user_obj)
                 new_record.save()
-                
+
                 return JsonResponse(data={"token": token_}, status=201, safe=False)
             else:
                 JsonResponse(
                     data={"message": "Resource not found"}, status=404, safe=False)
 
-            # image_path = f"/home/michal/Documents/Python/GetAccessToLyrics/Lyrics_display/files/qr_{token_}.jpg"
-            # image_file = open(image_path, 'rb')
-
         else:
             # Further investigation needed
             try:
                 return JsonResponse(data={"message": (res[0]["message"])}, status=int(res[1]), safe=False)
-            except:
-                #Needs to be logged - this should not be happening 
+            except Exception as e:
+                logger.error("An error occurred: %s", str(e))
                 return JsonResponse(data={"message": (res)}, status=int(res[1]), safe=False)
     else:
         return HttpResponse("Authorization header not present", status=401)
@@ -178,11 +180,6 @@ def re(request, token):
             del data[index + 1]
         else:
             index += 1
-
-    # serializer = ParagraphSerializer(data=data, many=True)
-    # serializer.is_valid(raise_exception=True)
-
-    # return Response(serializer.data)
 
     return JsonResponse(data, status=200, content_type='application/json', safe=False)
 

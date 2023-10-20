@@ -13,3 +13,4 @@ TransportSecurity
 logs/
 CachedData/
 CachedProfilesData/
+*.env
