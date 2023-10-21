@@ -1,4 +1,9 @@
 <script>
+
+// Proper Docker Compose setup
+// Untrack /migrations, __init__, admin.py, vscode, and __pycache__
+// Clean up App.vue, create custom warning, outsource validating to a separate function 
+
 import Modal from "./Modal.vue";
 
 export default {
@@ -7,7 +12,6 @@ export default {
 
   data() {
     return {
-      text: "",
       showModal: false,
       showModal_main: false,
       showModal_final: false,
@@ -26,12 +30,6 @@ export default {
       passwdTemp: null,
       passwdTempRe: null,
     };
-  },
-
-  created() {
-    const path = window.location.pathname;
-    var token = path.substring(1);
-    console.log("Token:", token);
   },
 
   methods: {
@@ -63,7 +61,7 @@ export default {
       location.reload();
     },
     OpenModal(modalNameToBeOpen, modalName = null, isFirst = false) {
-      if (modalName != "") {
+      if (modalName != null) {
         this[modalName] = false;
       }
       this[modalNameToBeOpen] = true;
@@ -83,7 +81,6 @@ export default {
             "Content-Type": "application/json",
             Authorization: `Bearer ${cookie}`,
           },
-          //body: JSON.stringify(data),
         };
 
       fetch("http://127.0.0.1:8000/" + token_ + "/qr", requestOptions)
@@ -94,9 +91,10 @@ export default {
           this.token = data.token;
           this.imgUrl = imgUrl;
 
-          // outsource to function
-          this.showmodal_create_code = false;
-          this.showModal_final = true;
+          this.OpenModal("showModal_final",null,true)
+
+          //this.showmodal_create_code = false;
+          //this.showModal_final = true;
         })
         .catch((error) => console.error(error));
     },
@@ -129,9 +127,6 @@ export default {
           .then((response) => response.json())
           .then((data) => {
             if (data.message) {
-              console.log(data);
-              //This needs to be fixed 
-              //this.showModalCreateNewUser = true;
 
               this.showModalLogin = true;
             } else {
@@ -140,6 +135,8 @@ export default {
           });
       } else {
         console.error("Cookie not found")
+        
+        // New pop up - do you want to log in or create acc 
         this.showModalLogin = true;
       }
     },
@@ -204,7 +201,6 @@ export default {
             "Content-Type": "application/json",
             Authorization: `Bearer ${cookie}`,
           },
-          //body: JSON.stringify(data),
         };
 
       fetch("http://127.0.0.1:8000/" + token_ + "/qr", requestOptions)
@@ -238,7 +234,7 @@ export default {
     },
 
     // validations needs to be moved to seperate functon - login/create use to same part
-    login() {
+   login() {
       const passwd = this.passwdTemp;
       if (passwd) {
         let regex = /@.*\./;
@@ -270,31 +266,29 @@ export default {
                 body: JSON.stringify(data),
               };
 
-              fetch("http://127.0.0.1:8000/login", requestOptions).then(
-                ((serverPromise) =>
-                  serverPromise.json()
-                .then((j) => {document.cookie = `bearerToken=${j.token}`
-                 
-                 //here to be teasted
-                 this.CloseModal("showModalLogin");
-                 //this.showModalLogin = false;
-                 // After login you should be redirected to created doc 
-                  this.ShowInfo();                
-                 })
-                .catch((error) => console.error("Error", error))
-              )
-              );
-            })
-            .catch((error) => {
-              console.error("Error", error);
-              console.log(response);
+              fetch("http://127.0.0.1:8000/login", requestOptions)
+                .then((serverPromise) => {
+                  if (serverPromise.ok) {
+                    serverPromise.json().then((response) => {
+                      document.cookie = `bearerToken=${response.token}`;
+                      this.CloseModal("showModalLogin");
+                      //this.ShowInfo();
+                    });
+                  } else {
+                    document.getElementById("error-message").innerHTML =
+                      "Invalid credentials";
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error", error);
+                });
             });
         }
       } else {
-        document.getElementById("error-message").innerHTML =
-          "Password is required";
+        document.getElementById("error-message").innerHTML = "Password is required";
       }
     },
+    //Vaidations needs to be outsorced to seperate function 
     createNewUser() {
       const passwd = this.passwdTemp;
       if (passwd) {
@@ -366,6 +360,7 @@ export default {
           throw new Error("Resource not found");
         } else if (response.status === 204) {
           this.notFound();
+          //Custom Warning needed
           throw new Error("There is no such .docx");
         } else {
           throw new Error("Something went wrong");
@@ -387,7 +382,6 @@ export default {
         }
 
         tab += "</div>"
-        //console.log(tab);
         var the_doc = document.getElementById("main");
         the_doc.innerHTML = tab;
       })
@@ -397,6 +391,7 @@ export default {
   },
 };
 </script>
+
 
 
 <template>
@@ -422,7 +417,7 @@ export default {
 
 
 
-        <!-- Create account in modal-->
+        <!-- Create account in modal - to be implemnted-->
         <Modal v-if="showModalCreateNewUser">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="width:100%" >
                 <div class="modal-content" id="the_content_part" style="width:100%">
@@ -477,8 +472,11 @@ export default {
                 
                 <div class="modal-body d-flex flex-column align-items-center background: transparent; width: 50%" style="width: 100%">
                             <br>
-                            <!--Needs to be done the right way-->
-                            <p style="text-align: center; color: white;">Here is the code: <h3>{{ this.token }}</h3></p>
+
+                            <div style="text-align: center; color: white;">
+                               Here is the code:
+                              <h3>{{ this.token }}</h3>
+                            </div>
                            
                             <br>
                             <img :src=this.imgUrl onclick="downloadFile('${imgUrl}')">
@@ -561,9 +559,7 @@ export default {
         </Modal>
 
 
-        <!-- Join via code modal 
-        This is fine no need to change this 
-        -->
+        <!-- Join via code modal -->
 
         <Modal v-if="showmodal_join_via_code">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="background: transparent; width: 50%">
@@ -584,7 +580,6 @@ export default {
         </Modal> 
 
 
-        <h1>{{text}}</h1>
         <div>
             <div class="a" id="main"></div>
         </div>

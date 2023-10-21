@@ -68,7 +68,7 @@ def login(request):
 
             return JsonResponse(data={"token": (str(token)[2:])[:-1], "username": username_}, status=200)
         else:
-            return HttpResponse("Wrong credentials", status=401)
+            return JsonResponse(data="Wrong credentials", status=401)
     except Exception as e:
         logger.error("An error occurred: %s", str(e))
         return JsonResponse({'error': "Invalid credentials"}, status=401)
