@@ -14,3 +14,8 @@ logs/
 CachedData/
 CachedProfilesData/
 *.env
+__pycache__
+migrations
+Backups
+.vscode
+__init__.py

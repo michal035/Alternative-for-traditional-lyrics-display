@@ -1,7 +1,5 @@
 <script>
 
-// Proper Docker Compose setup
-// Untrack /migrations, __init__, admin.py, vscode, and __pycache__
 // Clean up App.vue, create custom warning, outsource validating to a separate function 
 
 import Modal from "./Modal.vue";
