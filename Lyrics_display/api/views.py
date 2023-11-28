@@ -24,7 +24,8 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_PATH = os.path.join(BASE_DIR, 'logs', 'api.log')
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', filename=LOG_PATH, filemode='a')
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', filename=LOG_PATH, filemode='a')
 logger = logging.getLogger(__name__)
 
 c_handler = logging.StreamHandler()
@@ -65,8 +66,15 @@ def login(request):
             }
             token = jwt.encode(
                 token_payload, SECRET_KEY, algorithm="HS256")
+            token = str(token)[2:][:-1]
 
-            return JsonResponse(data={"token": (str(token)[2:])[:-1], "username": username_}, status=200)
+            response = JsonResponse(
+                {'message': 'Login successful'}, status=200)
+            response.set_cookie('access_token', token, httponly=True,
+                                expires=token_payload["exp"], secure=True, samesite='Strict')
+
+            return response
+            # return JsonResponse(data={"token": (str(token)[2:])[:-1], "username": username_}, status=200)
         else:
             return JsonResponse(data="Wrong credentials", status=401)
     except Exception as e:
@@ -150,10 +158,12 @@ def Create_new_doc(request):
         else:
             # Further investigation needed
             try:
-                return JsonResponse(data={"message": (res[0]["message"])}, status=int(res[1]), safe=False)
+                # int(res[1])
+                return JsonResponse(data={"message": (res[0]["message"])}, status=401, safe=False,)
             except Exception as e:
                 logger.error("An error occurred: %s", str(e))
-                return JsonResponse(data={"message": (res)}, status=int(res[1]), safe=False)
+                # int(res[1])
+                return JsonResponse(data={"message": (res)}, status=401, safe=False)
     else:
         return HttpResponse("Authorization header not present", status=401)
 
